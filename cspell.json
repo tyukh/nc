@@ -1,0 +1,28 @@
+{
+    "version": "0.2",
+    "ignorePaths": [],
+    "dictionaryDefinitions": [],
+    "dictionaries": [],
+    "words": [
+        "arrowParens",
+        "Cantarell",
+        "capslock",
+        "codepaths",
+        "dont",
+        "gettext",
+        "girs",
+        "gmodule",
+        "gobject",
+        "gulpfile",
+        "jscodeshift",
+        "msgid",
+        "ngettext",
+        "numlock",
+        "prefs",
+        "printerr",
+        "tsbuildinfo",
+        "Tyukh"
+    ],
+    "ignoreWords": [],
+    "import": []
+}

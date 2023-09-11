@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE schemalist SYSTEM "gschema.dtd">
+<schemalist>
+  <enum id="org.gnome.shell.extensions.nc.enum-launcher-position">
+    <value value="0" nick="first"/>    
+    <value value="-1" nick="last"/>    
+  </enum>
+  <schema id="org.gnome.shell.extensions.nc" path="/org/gnome/shell/extensions/nc/">
+    <!-- See also: https://docs.gtk.org/glib/gvariant-format-strings.html -->
+    <key name="font" type="s">
+      <default>"Cantarell"</default>
+    </key>
+    <key name="launcher-box" type="s">
+      <choices>
+        <choice value="left"/>
+        <choice value="center"/>
+        <choice value="right"/>
+      </choices>
+      <default>"center"</default>
+    </key>
+    <key name="launcher-position" enum="org.gnome.shell.extensions.nc.enum-launcher-position">
+      <default>"last"</default>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,13 @@
+{
+  "uuid": "nc@tyukh.github.io",
+  "name": "Numbers Commander",
+  "description": "Calculator with stack and postfix operations",
+  "shell-version": [
+    "45"
+  ],
+  "url": "https://github.com/tyukh/nc",
+  "gettext-domain": "nc@tyukh.github.io",
+  "settings-schema": "org.gnome.shell.extensions.nc",
+  "session-modes": ["user", "unlock-dialog"],
+  "version": 1
+}
