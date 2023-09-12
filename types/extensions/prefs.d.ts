@@ -1,11 +1,10 @@
 declare module 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js' {
   import {ExtensionBase} from 'resource:///org/gnome/shell/extensions/sharedInternals.js';
-  import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
   import Adw from '@girs/adw-1';
   import Gtk from '@girs/gtk-4.0';
 
   export class ExtensionPreferences extends ExtensionBase {
-    static lookupByUUID(uuid: string): Extension;
+    static lookupByUUID(uuid: string): object;
 
     static defineTranslationFunctions(url: string): {
       /**

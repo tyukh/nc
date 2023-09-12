@@ -2,7 +2,7 @@ declare module 'resource:///org/gnome/shell/extensions/extension.js' {
   import {ExtensionBase} from 'resource:///org/gnome/shell/extensions/sharedInternals.js';
 
   export class Extension extends ExtensionBase {
-    static lookupByUUID(uuid: string): Extension;
+    static lookupByUUID(uuid: string): object;
 
     static defineTranslationFunctions(url: string): {
       /**

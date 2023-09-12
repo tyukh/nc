@@ -7,14 +7,14 @@ declare module 'resource:///org/gnome/shell/extensions/sharedInternals.js' {
      *
      * @param {string} url - a file:// URL
      */
-    static lookupByURL(url: string): unknown;
+    static lookupByURL(url: string): object;
 
     /**
      * Look up an extension by UUID
      *
-     * @param {string} _uuid
+     * @param {string} uuid
      */
-    static lookupByUUID(_uuid: string): unknown;
+    static lookupByUUID(uuid: string): object;
 
     /**
      * @param {object} metadata - metadata passed in when loading the extension
