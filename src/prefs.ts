@@ -19,40 +19,42 @@ import {
 
 export default class NCPreferences extends ExtensionPreferences {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private _preferencesInterface: any;
+  private static _preferencesInterface: any;
 
   /**
    * @param {object} metadata - metadata passed in when loading the extension
    */
   constructor(metadata: object) {
     super(metadata);
-    this._preferencesInterface = GObject.registerClass(
-      {
-        GTypeName: 'PreferencesInterface',
-        Template: this.dir.get_child('ui').get_child('prefs.ui').get_uri()!,
-        InternalChildren: ['font', 'launcherBox', 'launcherPosition'],
-      },
-      class PreferencesInterface extends Adw.PreferencesPage {
-        private _settings: Gio.Settings;
 
-        private readonly _font!: Gtk.FontButton;
-        private readonly _launcherBox!: Gtk.Scale;
-        private readonly _launcherPosition!: Gtk.Scale;
+    if (NCPreferences._preferencesInterface === undefined)
+      NCPreferences._preferencesInterface = GObject.registerClass(
+        {
+          GTypeName: 'PreferencesInterface',
+          Template: this.dir.get_child('ui').get_child('prefs.ui').get_uri()!,
+          InternalChildren: ['font', 'launcherBox', 'launcherPosition'],
+        },
+        class PreferencesInterface extends Adw.PreferencesPage {
+          private _settings: Gio.Settings;
 
-        constructor(window: Adw.PreferencesWindow, prefs: ExtensionPreferences, properties = {}) {
-          super(properties);
+          private readonly _font!: Gtk.FontButton;
+          private readonly _launcherBox!: Gtk.Scale;
+          private readonly _launcherPosition!: Gtk.Scale;
 
-          this._settings = prefs.getSettings();
+          constructor(window: Adw.PreferencesWindow, prefs: ExtensionPreferences, properties = {}) {
+            super(properties);
 
-          this._font!.set_font(this._settings.get_string('font'));
-          this._launcherBox!.set_value(
-            ['left', 'center', 'right'].indexOf(this._settings.get_string('launcher-box')!)
-          );
-          this._launcherPosition!.set_value(
-            [0, -1].indexOf(this._settings.get_enum('launcher-position'))
-          );
+            this._settings = prefs.getSettings();
 
-          /*
+            this._font!.set_font(this._settings.get_string('font'));
+            this._launcherBox!.set_value(
+              ['left', 'center', 'right'].indexOf(this._settings.get_string('launcher-box')!)
+            );
+            this._launcherPosition!.set_value(
+              [0, -1].indexOf(this._settings.get_enum('launcher-position'))
+            );
+
+            /*
                 this._launcherBox.set_format_value_func(([], value) => {
                     return ([_("left"), _("center"), _("right")]).at(value);
                 });
@@ -61,48 +63,48 @@ export default class NCPreferences extends ExtensionPreferences {
                 });
           */
 
-          this._launcherBox!.set_format_value_func(() => {
-            return _('icon');
-          });
-          this._launcherPosition!.set_format_value_func(() => {
-            return _('icon');
-          });
+            this._launcherBox!.set_format_value_func(() => {
+              return _('icon');
+            });
+            this._launcherPosition!.set_format_value_func(() => {
+              return _('icon');
+            });
 
-          window.connect('close-request', () => {
-            this._launcherBox!.set_format_value_func(null);
-            this._launcherPosition!.set_format_value_func(null);
-          });
+            window.connect('close-request', () => {
+              this._launcherBox!.set_format_value_func(null);
+              this._launcherPosition!.set_format_value_func(null);
+            });
 
-          [_('left'), _('center'), _('right')].forEach((label, index) => {
-            this._launcherBox!.add_mark(index, Gtk.PositionType.BOTTOM, label);
-          });
-          [_('first'), _('last')].forEach((label, index) => {
-            this._launcherPosition!.add_mark(index, Gtk.PositionType.BOTTOM, label);
-          });
-        }
+            [_('left'), _('center'), _('right')].forEach((label, index) => {
+              this._launcherBox!.add_mark(index, Gtk.PositionType.BOTTOM, label);
+            });
+            [_('first'), _('last')].forEach((label, index) => {
+              this._launcherPosition!.add_mark(index, Gtk.PositionType.BOTTOM, label);
+            });
+          }
 
-        private _onFontSet(): void {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
-          this._settings.set_string('font', this._font!.get_font_family()?.get_name()!);
-        }
+          private _onFontSet(): void {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
+            this._settings.set_string('font', this._font!.get_font_family()?.get_name()!);
+          }
 
-        private _onLauncherBoxChange(): void {
-          this._settings.set_string(
-            'launcher-box',
+          private _onLauncherBoxChange(): void {
+            this._settings.set_string(
+              'launcher-box',
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              ['left', 'center', 'right'].at(this._launcherBox!.get_value())!
+            );
+          }
+
+          private _onLauncherPositionChange(): void {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            ['left', 'center', 'right'].at(this._launcherBox!.get_value())!
-          );
+            this._settings.set_enum(
+              'launcher-position',
+              [0, -1].at(this._launcherPosition!.get_value())!
+            );
+          }
         }
-
-        private _onLauncherPositionChange(): void {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          this._settings.set_enum(
-            'launcher-position',
-            [0, -1].at(this._launcherPosition!.get_value())!
-          );
-        }
-      }
-    );
+      );
   }
 
   /**
@@ -113,6 +115,6 @@ export default class NCPreferences extends ExtensionPreferences {
    * @param {Adw.PreferencesWindow} window - the preferences window
    */
   fillPreferencesWindow(window: Adw.PreferencesWindow) {
-    window.add(new this._preferencesInterface(window, this));
+    window.add(new NCPreferences._preferencesInterface(window, this));
   }
 }
