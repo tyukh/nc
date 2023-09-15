@@ -11,6 +11,7 @@ import Gio from 'gi://Gio';
 
 // import * as Interface from './interface';
 
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 export default class NCExtension extends Extension {
