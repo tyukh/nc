@@ -18,6 +18,7 @@
         "msgid",
         "ngettext",
         "numlock",
+        "pgettext",
         "prefs",
         "printerr",
         "tsbuildinfo",

@@ -6,12 +6,12 @@
   <!-- interface-authors Roman Tyukh -->
   <requires lib="gtk" version="4.6" />
   <requires lib="libadwaita" version="1.1" />
-  <object class="GtkAdjustment" id="launcherBoxAdjustment">
+  <object class="GtkAdjustment" id="positionAdjustment">
     <property name="lower">0</property>
     <property name="upper">2</property>
     <property name="step-increment">1</property>
   </object>
-  <object class="GtkAdjustment" id="launcherPositionAdjustment">
+  <object class="GtkAdjustment" id="orderAdjustment">
     <property name="lower">0</property>
     <property name="upper">1</property>
     <property name="step-increment">1</property>
@@ -41,11 +41,11 @@
         </child>
         <child>
           <object class="AdwActionRow">
-            <property name="activatable-widget">launcherBox</property>
-            <property name="title" translatable="yes">Panel box</property>
+            <property name="activatable-widget">position</property>
+            <property name="title" translatable="yes">Extension icon position</property>
             <property name="subtitle" translatable="yes">Side of the panel where the extension icon placed</property>
             <child>
-              <object class="GtkScale" id="launcherBox">
+              <object class="GtkScale" id="position">
                 <property name="digits">0</property>
                 <property name="draw-value">true</property>
                 <property name="has-origin">false</property>
@@ -54,19 +54,19 @@
                 <property name="restrict-to-fill-level">false</property>
                 <property name="show-fill-level">false</property>
                 <property name="value-pos">top</property>
-                <property name="adjustment">launcherBoxAdjustment</property>
-                <signal name="value-changed" handler="_onLauncherBoxChange" />
+                <property name="adjustment">positionAdjustment</property>
+                <signal name="value-changed" handler="_onPositionChange" />
               </object>
             </child>
           </object>
         </child>
         <child>
           <object class="AdwActionRow">
-            <property name="activatable-widget">launcherPosition</property>
-            <property name="title" translatable="yes">Position in panel box group</property>
-            <property name="subtitle" translatable="yes">Position of the extension icon in the icon group</property>
+            <property name="activatable-widget">order</property>
+            <property name="title" translatable="yes">Extension icon order</property>
+            <property name="subtitle" translatable="yes">Order of the extension icon in the icon group</property>
             <child>
-              <object class="GtkScale" id="launcherPosition">
+              <object class="GtkScale" id="order">
                 <property name="digits">0</property>
                 <property name="draw-value">true</property>
                 <property name="has-origin">false</property>
@@ -75,8 +75,8 @@
                 <property name="restrict-to-fill-level">false</property>
                 <property name="show-fill-level">false</property>
                 <property name="value-pos">top</property>
-                <property name="adjustment">launcherPositionAdjustment</property>
-                <signal name="value-changed" handler="_onLauncherPositionChange" />
+                <property name="adjustment">orderAdjustment</property>
+                <signal name="value-changed" handler="_onOrderChange" />
               </object>
             </child>
           </object>

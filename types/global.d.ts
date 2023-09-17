@@ -5,9 +5,5 @@
  *
  */
 
-'use strict';
-
-import '@girs/adw-1';
-import '@girs/gio-2.0';
-import '@girs/gobject-2.0';
-import '@girs/gtk-4.0';
+import 'augmentations.d.ts';
+import 'ambients.d.ts';

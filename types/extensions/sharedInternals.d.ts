@@ -1,5 +1,5 @@
 declare module 'resource:///org/gnome/shell/extensions/sharedInternals.js' {
-  import Gio from '@girs/gio-2.0';
+  import Gio from 'gi://Gio';
 
   export class ExtensionBase {
     /**

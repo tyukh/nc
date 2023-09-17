@@ -9,19 +9,18 @@
 
 import Gio from 'gi://Gio';
 
-// import * as Interface from './interface';
+import NCInterface from './interface.js';
 
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 export default class NCExtension extends Extension {
   private readonly _settings: Gio.Settings;
 
   private _font: string;
-  private _launcherBox: string;
-  private _launcherPosition: number;
+  private _position: string;
+  private _order: number;
 
-  // private _interface!: Interface | null;
+  private _interface!: NCInterface | null;
 
   /**
    * This class is constructed once when your extension is loaded, not
@@ -39,15 +38,12 @@ export default class NCExtension extends Extension {
     this._settings = this.getSettings();
 
     this._settings.connect('changed::font', this._onExtensionSettingsChanged.bind(this));
-    this._settings.connect('changed::launcher-box', this._onExtensionSettingsChanged.bind(this));
-    this._settings.connect(
-      'changed::launcher-position',
-      this._onExtensionSettingsChanged.bind(this)
-    );
+    this._settings.connect('changed::position', this._onExtensionSettingsChanged.bind(this));
+    this._settings.connect('changed::order', this._onExtensionSettingsChanged.bind(this));
 
     this._font = this._settings.get_string('font')!;
-    this._launcherBox = this._settings.get_string('launcher-box')!;
-    this._launcherPosition = this._settings.get_enum('launcher-position')!;
+    this._position = this._settings.get_string('position')!;
+    this._order = this._settings.get_enum('order')!;
   }
 
   /**
@@ -58,20 +54,7 @@ export default class NCExtension extends Extension {
    * widgets, connect signals or modify GNOME Shell's behavior.
    */
   public enable(): void {
-    //    this._interface = new Interface.Interface({
-    //      font: this._font,
-    //    });
-    /* In here we are adding the button in the status area
-     * - button is and instance of panelMenu.Button
-     * - 0 is the position
-     * - `right` is the box where we want our button to be displayed (left/center/right)
-     */
-    //    Main.panel?.addToStatusArea(
-    //      this.uuid,
-    //      this._interface.launcher!,
-    //      this._launcherPosition,
-    //      this._launcherBox
-    //    );
+    this._interface = new NCInterface(this, this._font, this._position, this._order);
   }
 
   /**
@@ -82,15 +65,15 @@ export default class NCExtension extends Extension {
    * Not doing so is the most common reason extensions are rejected in review!
    */
   public disable(): void {
-    //    this._interface?.destroy();
-    //    this._interface = null;
+    this._interface?.destroy();
+    this._interface = null;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private _onExtensionSettingsChanged(_source: this, _key: string): void {
     this._font = this._settings.get_string('font')!;
-    this._launcherBox = this._settings.get_string('launcher-box')!;
-    this._launcherPosition = this._settings.get_enum('launcher-position')!;
+    this._position = this._settings.get_string('position')!;
+    this._order = this._settings.get_enum('order')!;
 
     this.disable();
     this.enable();

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE schemalist SYSTEM "gschema.dtd">
 <schemalist>
-  <enum id="org.gnome.shell.extensions.nc.enum-launcher-position">
+  <enum id="org.gnome.shell.extensions.nc.enum-order">
     <value value="0" nick="first"/>    
     <value value="-1" nick="last"/>    
   </enum>
@@ -10,7 +10,7 @@
     <key name="font" type="s">
       <default>"Cantarell"</default>
     </key>
-    <key name="launcher-box" type="s">
+    <key name="position" type="s">
       <choices>
         <choice value="left"/>
         <choice value="center"/>
@@ -18,7 +18,7 @@
       </choices>
       <default>"center"</default>
     </key>
-    <key name="launcher-position" enum="org.gnome.shell.extensions.nc.enum-launcher-position">
+    <key name="order" enum="org.gnome.shell.extensions.nc.enum-order">
       <default>"last"</default>
     </key>
   </schema>

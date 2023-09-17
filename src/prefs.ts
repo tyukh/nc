@@ -9,7 +9,7 @@
 
 import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
-import Gtk from 'gi://Gtk?version=4.0';
+import Gtk from 'gi://Gtk';
 import GObject from 'gi://GObject';
 
 import {
@@ -32,14 +32,14 @@ export default class NCPreferences extends ExtensionPreferences {
         {
           GTypeName: 'PreferencesInterface',
           Template: this.dir.get_child('ui').get_child('prefs.ui').get_uri()!,
-          InternalChildren: ['font', 'launcherBox', 'launcherPosition'],
+          InternalChildren: ['font', 'position', 'order'],
         },
         class PreferencesInterface extends Adw.PreferencesPage {
           private _settings: Gio.Settings;
 
           private readonly _font!: Gtk.FontButton;
-          private readonly _launcherBox!: Gtk.Scale;
-          private readonly _launcherPosition!: Gtk.Scale;
+          private readonly _position!: Gtk.Scale;
+          private readonly _order!: Gtk.Scale;
 
           constructor(window: Adw.PreferencesWindow, prefs: ExtensionPreferences, properties = {}) {
             super(properties);
@@ -47,39 +47,38 @@ export default class NCPreferences extends ExtensionPreferences {
             this._settings = prefs.getSettings();
 
             this._font!.set_font(this._settings.get_string('font'));
-            this._launcherBox!.set_value(
-              ['left', 'center', 'right'].indexOf(this._settings.get_string('launcher-box')!)
+            this._position!.set_value(
+              ['left', 'center', 'right'].indexOf(this._settings.get_string('position')!)
             );
-            this._launcherPosition!.set_value(
-              [0, -1].indexOf(this._settings.get_enum('launcher-position'))
-            );
-
+            this._order!.set_value([0, -1].indexOf(this._settings.get_enum('order')));
             /*
-                this._launcherBox.set_format_value_func(([], value) => {
-                    return ([_("left"), _("center"), _("right")]).at(value);
-                });
-                this._launcherPosition.set_format_value_func(([], value) => {
-                    return ([_("first"), _("last")]).at(value);
-                });
-          */
+            this._position.set_format_value_func((_scale: Gtk.Scale, value: number): string => {
+              return [_('left'), _('center'), _('right')].at(value)!;
+            });
+            this._order.set_format_value_func((_scale: Gtk.Scale, value: number): string => {
+              return [_('first'), _('last')].at(value)!;
+            });
+            */
 
-            this._launcherBox!.set_format_value_func(() => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            this._position!.set_format_value_func((_scale: Gtk.Scale, _value: number): string => {
               return _('icon');
             });
-            this._launcherPosition!.set_format_value_func(() => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            this._order!.set_format_value_func((_scale: Gtk.Scale, _value: number): string => {
               return _('icon');
             });
 
             window.connect('close-request', () => {
-              this._launcherBox!.set_format_value_func(null);
-              this._launcherPosition!.set_format_value_func(null);
+              this._position!.set_format_value_func(null);
+              this._order!.set_format_value_func(null);
             });
 
             [_('left'), _('center'), _('right')].forEach((label, index) => {
-              this._launcherBox!.add_mark(index, Gtk.PositionType.BOTTOM, label);
+              this._position!.add_mark(index, Gtk.PositionType.BOTTOM, label);
             });
             [_('first'), _('last')].forEach((label, index) => {
-              this._launcherPosition!.add_mark(index, Gtk.PositionType.BOTTOM, label);
+              this._order!.add_mark(index, Gtk.PositionType.BOTTOM, label);
             });
           }
 
@@ -88,20 +87,17 @@ export default class NCPreferences extends ExtensionPreferences {
             this._settings.set_string('font', this._font!.get_font_family()?.get_name()!);
           }
 
-          private _onLauncherBoxChange(): void {
+          private _onPositionChange(): void {
             this._settings.set_string(
-              'launcher-box',
+              'position',
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              ['left', 'center', 'right'].at(this._launcherBox!.get_value())!
+              ['left', 'center', 'right'].at(this._position!.get_value())!
             );
           }
 
-          private _onLauncherPositionChange(): void {
+          private _onOrderChange(): void {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            this._settings.set_enum(
-              'launcher-position',
-              [0, -1].at(this._launcherPosition!.get_value())!
-            );
+            this._settings.set_enum('order', [0, -1].at(this._order!.get_value())!);
           }
         }
       );

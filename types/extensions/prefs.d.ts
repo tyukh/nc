@@ -1,7 +1,7 @@
 declare module 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js' {
   import {ExtensionBase} from 'resource:///org/gnome/shell/extensions/sharedInternals.js';
-  import Adw from '@girs/adw-1';
-  import Gtk from '@girs/gtk-4.0';
+  import Adw from 'gi://Adw';
+  import Gtk from 'gi://Gtk';
 
   export class ExtensionPreferences extends ExtensionBase {
     static lookupByUUID(uuid: string): object;
