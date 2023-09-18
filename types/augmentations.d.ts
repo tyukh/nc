@@ -1,3 +1,10 @@
+/* augmentations.d.ts
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ * SPDX-FileCopyrightText: 2023 Roman Tyukh
+ *
+ */
+
 import type Clutter from '@gi-types/clutter10';
 
 declare module '@gi-types/clutter10' {

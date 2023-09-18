@@ -1,3 +1,10 @@
+/* ambients.d.ts
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ * SPDX-FileCopyrightText: 2023 Roman Tyukh
+ *
+ */
+
 declare module 'gi://Adw' {
   import * as Adw from '@gi-types/adw1';
   export default Adw;

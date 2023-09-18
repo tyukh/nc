@@ -1,3 +1,10 @@
+/* prefs.d.ts
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ * SPDX-FileCopyrightText: 2023 Roman Tyukh
+ *
+ */
+
 declare module 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js' {
   import {ExtensionBase} from 'resource:///org/gnome/shell/extensions/sharedInternals.js';
   import Adw from 'gi://Adw';

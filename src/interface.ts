@@ -1,6 +1,8 @@
 /* interface.ts
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
+ * SPDX-FileCopyrightText: 2023 Roman Tyukh
+ *
  */
 
 'use strict';
@@ -119,7 +121,7 @@ export default class NCInterface {
       reactive: false,
       can_focus: false,
       activate: false,
-      style_class: 'panel-calc-rpn-PopupBaseMenuItem',
+      style_class: 'NC-PopupBaseMenuItem',
     });
     indicatorArea.setOrnament(PopupMenu.Ornament.HIDDEN);
     this._initIndicator(indicatorArea, font);
@@ -129,7 +131,7 @@ export default class NCInterface {
       reactive: false,
       can_focus: false,
       activate: false,
-      style_class: 'panel-calc-rpn-PopupBaseMenuItem',
+      style_class: 'NC-PopupBaseMenuItem',
     });
     keyboardArea.setOrnament(PopupMenu.Ornament.HIDDEN);
     this._initKeyboard(keyboardArea, font);
@@ -141,55 +143,6 @@ export default class NCInterface {
     menu.addMenuItem(keyboardArea);
   }
 
-  private _initRegister(stackBox: St.BoxLayout, label: string, font: string): St.Label {
-    const box = new St.BoxLayout({
-      vertical: false,
-      x_expand: true,
-      y_expand: true,
-      x_align: Clutter.ActorAlign.FILL,
-      y_align: Clutter.ActorAlign.CENTER,
-      style_class: 'panel-calc-rpn-registerBoxLayout',
-    });
-
-    const valueBox = new St.BoxLayout({
-      x_expand: true,
-      x_align: Clutter.ActorAlign.FILL,
-      y_align: Clutter.ActorAlign.CENTER,
-      style_class: 'panel-calc-rpn-registerValueBoxLayout',
-    });
-    const nameBox = new St.BoxLayout({
-      x_align: Clutter.ActorAlign.FILL,
-      y_align: Clutter.ActorAlign.CENTER,
-      style_class: 'panel-calc-rpn-registerNameBoxLayout',
-    });
-
-    const value = new St.Label({
-      text: '',
-      x_expand: true,
-      x_align: Clutter.ActorAlign.START,
-      y_align: Clutter.ActorAlign.CENTER,
-      style_class: 'panel-calc-rpn-registerValueLabel',
-    });
-    value.set_style(`font-family: ${font}`);
-
-    const name = new St.Label({
-      text: label,
-      x_align: Clutter.ActorAlign.START,
-      y_align: Clutter.ActorAlign.CENTER,
-      style_class: 'panel-calc-rpn-registerNameLabel',
-    });
-    name.set_style(`font-family: ${font}`);
-
-    valueBox.add_actor(value);
-    nameBox.add_actor(name);
-
-    box.add_actor(valueBox);
-    box.add_actor(nameBox);
-    stackBox.add_actor(box);
-
-    return value;
-  }
-
   private _initStack(stackArea: PopupMenu.PopupSubMenuMenuItem, font: string): void {
     const stack1Box = new St.BoxLayout({
       vertical: true,
@@ -198,7 +151,7 @@ export default class NCInterface {
       x_align: Clutter.ActorAlign.FILL,
       y_align: Clutter.ActorAlign.CENTER,
       opacity: 150,
-      style_class: 'panel-calc-rpn-stack1BoxLayout',
+      style_class: 'NC-stack1BoxLayout',
     });
     const stack2Box = new St.BoxLayout({
       vertical: true,
@@ -207,14 +160,63 @@ export default class NCInterface {
       x_align: Clutter.ActorAlign.FILL,
       y_align: Clutter.ActorAlign.CENTER,
       opacity: 150,
-      style_class: 'panel-calc-rpn-stack2BoxLayout',
+      style_class: 'NC-stack2BoxLayout',
     });
 
-    this._x1RegisterLabel = this._initRegister(stack1Box, 'X\u{2081}', font);
-    this._tRegisterLabel = this._initRegister(stack2Box, 'T', font);
-    this._zRegisterLabel = this._initRegister(stack2Box, 'Z', font);
-    this._yRegisterLabel = this._initRegister(stack2Box, 'Y', font);
-    this._xRegisterLabel = this._initRegister(stack2Box, 'X', font);
+    function addRegister(stackBox: St.BoxLayout, label: string, font: string): St.Label {
+      const box = new St.BoxLayout({
+        vertical: false,
+        x_expand: true,
+        y_expand: true,
+        x_align: Clutter.ActorAlign.FILL,
+        y_align: Clutter.ActorAlign.CENTER,
+        style_class: 'NC-registerBoxLayout',
+      });
+
+      const valueBox = new St.BoxLayout({
+        x_expand: true,
+        x_align: Clutter.ActorAlign.FILL,
+        y_align: Clutter.ActorAlign.CENTER,
+        style_class: 'NC-registerValueBoxLayout',
+      });
+      const nameBox = new St.BoxLayout({
+        x_align: Clutter.ActorAlign.FILL,
+        y_align: Clutter.ActorAlign.CENTER,
+        style_class: 'NC-registerNameBoxLayout',
+      });
+
+      const value = new St.Label({
+        text: '',
+        x_expand: true,
+        x_align: Clutter.ActorAlign.START,
+        y_align: Clutter.ActorAlign.CENTER,
+        style_class: 'NC-registerValueLabel',
+      });
+      value.set_style(`font-family: ${font}`);
+
+      const name = new St.Label({
+        text: label,
+        x_align: Clutter.ActorAlign.START,
+        y_align: Clutter.ActorAlign.CENTER,
+        style_class: 'NC-registerNameLabel',
+      });
+      name.set_style(`font-family: ${font}`);
+
+      valueBox.add_actor(value);
+      nameBox.add_actor(name);
+
+      box.add_actor(valueBox);
+      box.add_actor(nameBox);
+      stackBox.add_actor(box);
+
+      return value;
+    }
+
+    this._x1RegisterLabel = addRegister(stack1Box, 'X\u{2081}', font);
+    this._tRegisterLabel = addRegister(stack2Box, 'T', font);
+    this._zRegisterLabel = addRegister(stack2Box, 'Z', font);
+    this._yRegisterLabel = addRegister(stack2Box, 'Y', font);
+    this._xRegisterLabel = addRegister(stack2Box, 'X', font);
 
     stackArea.menu.box.add(stack1Box);
     stackArea.menu.box.add(new PopupMenu.PopupSeparatorMenuItem());
@@ -228,19 +230,19 @@ export default class NCInterface {
       y_expand: true,
       x_align: Clutter.ActorAlign.FILL,
       y_align: Clutter.ActorAlign.FILL,
-      style_class: 'panel-calc-rpn-indicatorBoxLayout',
+      style_class: 'NC-indicatorBoxLayout',
     });
 
     const mantissaBox = new St.BoxLayout({
       x_expand: true,
       x_align: Clutter.ActorAlign.FILL,
       y_align: Clutter.ActorAlign.CENTER,
-      style_class: 'panel-calc-rpn-indicatorMantissaBoxLayout',
+      style_class: 'NC-indicatorMantissaBoxLayout',
     });
     const exponentBox = new St.BoxLayout({
       x_align: Clutter.ActorAlign.FILL,
       y_align: Clutter.ActorAlign.CENTER,
-      style_class: 'panel-calc-rpn-indicatorExponentBoxLayout',
+      style_class: 'NC-indicatorExponentBoxLayout',
     });
 
     this._mantissaIndicatorLabel = new St.Label({
@@ -248,7 +250,7 @@ export default class NCInterface {
       x_expand: true,
       x_align: Clutter.ActorAlign.START,
       y_align: Clutter.ActorAlign.CENTER,
-      style_class: 'panel-calc-rpn-indicatorMantissaLabel',
+      style_class: 'NC-indicatorMantissaLabel',
     });
     this._mantissaIndicatorLabel.set_style(`font-family: ${font}`);
 
@@ -257,7 +259,7 @@ export default class NCInterface {
       x_expand: true,
       x_align: Clutter.ActorAlign.END,
       y_align: Clutter.ActorAlign.CENTER,
-      style_class: 'panel-calc-rpn-indicatorExponentLabel',
+      style_class: 'NC-indicatorExponentLabel',
     });
     this._exponentIndicatorLabel.set_style(`font-family: ${font}`);
 
@@ -330,6 +332,7 @@ export default class NCInterface {
       OP_DECIMAL: '{x}',
       OP_ABSOLUTE: '|x|',
     };
+
     const keyMatrix = [
       {
         keys: [
@@ -338,14 +341,14 @@ export default class NCInterface {
             label: Glyph.MODE_F,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-yellowButton',
+            style_class: 'NC-yellowButton',
           },
           {
             id: 2, // Processor.Processor.Key.K,
             label: Glyph.MODE_K,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-blueButton',
+            style_class: 'NC-blueButton',
           },
           {
             id: 0, // Processor.Processor.Key.RESERVED_NULL,
@@ -360,35 +363,35 @@ export default class NCInterface {
             label: Glyph.SEVEN,
             labelF: Glyph.OP_SINE,
             labelK: Glyph.OP_INTEGER,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 4, // Processor.Processor.Key.EIGHT,
             label: Glyph.EIGHT,
             labelF: Glyph.OP_COSINE,
             labelK: Glyph.OP_DECIMAL,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 5, // Processor.Processor.Key.NINE,
             label: Glyph.NINE,
             labelF: Glyph.OP_TANGENT,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 6, // Processor.Processor.Key.MINUS,
             label: Glyph.OP_SUBTRACT,
             labelF: Glyph.OP_SQRT,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 7, // Processor.Processor.Key.DIVIDE,
             label: Glyph.OP_DIVIDE,
             labelF: Glyph.OP_1_DIV_X,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
         ],
         labels: true,
@@ -400,35 +403,35 @@ export default class NCInterface {
             label: Glyph.FOUR,
             labelF: Glyph.OP_ARCSINE,
             labelK: Glyph.OP_ABSOLUTE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 9, // Processor.Processor.Key.FIVE,
             label: Glyph.FIVE,
             labelF: Glyph.OP_ARCCOSINE,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 10, // Processor.Processor.Key.SIX,
             label: Glyph.SIX,
             labelF: Glyph.OP_ARCTANGENT,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 11, // Processor.Processor.Key.PLUS,
             label: Glyph.OP_ADD,
             labelF: Glyph.PI,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 12, // Processor.Processor.Key.MULTIPLY,
             label: Glyph.OP_MULTIPLY,
             labelF: Glyph.OP_X_SQ,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
         ],
         labels: true,
@@ -440,35 +443,35 @@ export default class NCInterface {
             label: Glyph.ONE,
             labelF: Glyph.OP_E_POW_X,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 14, // Processor.Processor.Key.TWO,
             label: Glyph.TWO,
             labelF: Glyph.OP_LG,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 15, // Processor.Processor.Key.THREE,
             label: Glyph.THREE,
             labelF: Glyph.OP_LN,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 16, // Processor.Processor.Key.SWAP,
             label: Glyph.OP_SWAP,
             labelF: Glyph.OP_X_POW_Y,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 17, // Processor.Processor.Key.PUSH,
             label: Glyph.OP_PUSH_X,
             labelF: Glyph.OP_BACK_X,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
         ],
         labels: true,
@@ -480,35 +483,35 @@ export default class NCInterface {
             label: Glyph.ZERO,
             labelF: Glyph.OP_TEN_POW_X,
             labelK: Glyph.OP_NOP,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 19, // Processor.Processor.Key.POINT,
             label: Glyph.POINT,
             labelF: Glyph.OP_CIRCLE,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 20, // Processor.Processor.Key.SIGN,
             label: Glyph.SIGN,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 21, // Processor.Processor.Key.ENTER_E,
             label: Glyph.OP_ENTER_EXPONENT,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-grayButton',
+            style_class: 'NC-grayButton',
           },
           {
             id: 22, // Processor.Processor.Key.CLEAR_X,
             label: Glyph.OP_CLEAR_X,
             labelF: Glyph.OP_CLEAR_F,
             labelK: Glyph.NONE,
-            style_class: 'panel-calc-rpn-redButton',
+            style_class: 'NC-redButton',
           },
         ],
         labels: true,
@@ -535,7 +538,7 @@ export default class NCInterface {
       x_expand: true,
       y_expand: true,
       y_align: Clutter.ActorAlign.CENTER,
-      style_class: 'panel-calc-rpn-BoxLayout',
+      style_class: 'NC-BoxLayout',
     });
 
     keyMatrix.forEach((row) => {
@@ -543,8 +546,9 @@ export default class NCInterface {
         vertical: false,
         x_expand: true,
         y_align: Clutter.ActorAlign.CENTER,
-        style_class: 'panel-calc-rpn-BoxLayout',
+        style_class: 'NC-BoxLayout',
       });
+
       row.keys.forEach((key) => {
         if (key.id !== 0 /*Processor.Processor.Key.RESERVED_NULL*/) {
           const keyButton = new Key({
@@ -565,7 +569,7 @@ export default class NCInterface {
               y_expand: true,
               x_align: Clutter.ActorAlign.START,
               y_align: Clutter.ActorAlign.END,
-              style_class: 'panel-calc-rpn-BoxLayout',
+              style_class: 'NC-BoxLayout',
             });
             const labelBox = new St.BoxLayout({
               vertical: false,
@@ -573,59 +577,44 @@ export default class NCInterface {
               y_expand: true,
               x_align: Clutter.ActorAlign.FILL,
               y_align: Clutter.ActorAlign.END,
-              style_class: 'panel-calc-rpn-BoxLayout',
+              style_class: 'NC-BoxLayout',
             });
-            if (key.labelF !== '') {
-              const labelFBox = new St.BoxLayout({
+
+            // eslint-disable-next-line no-inner-declarations
+            function addLabel(label: string, style: string): St.BoxLayout {
+              const labelBox = new St.BoxLayout({
                 vertical: false,
                 x_expand: true,
                 y_expand: true,
                 x_align: Clutter.ActorAlign.CENTER,
                 y_align: Clutter.ActorAlign.END,
-                style_class: 'panel-calc-rpn-BoxLayout',
+                style_class: 'NC-BoxLayout',
               });
-              const labelF = new St.Label({
-                text: key.labelF,
+              const labelText = new St.Label({
+                text: label,
                 x_align: Clutter.ActorAlign.CENTER,
                 y_align: Clutter.ActorAlign.END,
-                style_class: 'panel-calc-rpn-labelFLabel',
+                style_class: style,
               });
-              labelF.set_style(`font-family: ${font}`);
-              labelFBox.add_actor(labelF);
-              labelBox.add_actor(labelFBox);
+              labelText.set_style(`font-family: ${font}`);
+              labelBox.add_actor(labelText);
+              return labelBox;
             }
-            if (key.labelK !== '') {
-              const labelKBox = new St.BoxLayout({
-                vertical: false,
-                x_expand: true,
-                y_expand: true,
-                x_align: Clutter.ActorAlign.CENTER,
-                y_align: Clutter.ActorAlign.END,
-                style_class: 'panel-calc-rpn-BoxLayout',
-              });
-              const labelK = new St.Label({
-                text: key.labelK,
-                x_align: Clutter.ActorAlign.CENTER,
-                y_align: Clutter.ActorAlign.END,
-                style_class: 'panel-calc-rpn-labelKLabel',
-              });
-              labelK.set_style(`font-family: ${font}`);
-              labelKBox.add_actor(labelK);
-              labelBox.add_actor(labelKBox);
-            }
+
+            if (key.labelF !== '') labelBox.add_actor(addLabel(key.labelF!, 'NC-labelFLabel'));
+            if (key.labelK !== '') labelBox.add_actor(addLabel(key.labelK!, 'NC-labelKLabel'));
+
             placeholderBox.add_actor(labelBox);
             placeholderBox.add_actor(keyButton);
             lineKeyboardBox.add_actor(placeholderBox);
-          } else {
-            lineKeyboardBox.add_actor(keyButton);
-          }
+          } else lineKeyboardBox.add_actor(keyButton);
         } else {
           const controlBox = new St.BoxLayout({
             vertical: false,
             x_expand: true,
             x_align: Clutter.ActorAlign.FILL,
             y_align: Clutter.ActorAlign.FILL,
-            style_class: 'panel-calc-rpn-controlBoxLayout',
+            style_class: 'NC-controlBoxLayout',
           });
           controlBox.add_actor(
             new St.BoxLayout({
@@ -635,12 +624,13 @@ export default class NCInterface {
               y_align: Clutter.ActorAlign.FILL,
             })
           );
+
           controlButtons.forEach((controlButton) => {
             const button = new St.Button({
               can_focus: true,
               reactive: true,
               track_hover: true,
-              style_class: 'panel-calc-rpn-controlButton',
+              style_class: 'NC-controlButton',
               x_align: Clutter.ActorAlign.END,
               y_align: Clutter.ActorAlign.CENTER,
             });
@@ -652,6 +642,7 @@ export default class NCInterface {
             button.connect('clicked', controlButton.handler);
             controlBox.add_actor(button);
           });
+
           lineKeyboardBox.add_actor(controlBox);
         }
       });

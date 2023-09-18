@@ -1,3 +1,10 @@
+/* main.d.ts
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ * SPDX-FileCopyrightText: 2023 Roman Tyukh
+ *
+ */
+
 declare module 'resource:///org/gnome/shell/ui/main.js' {
   import {Panel} from 'resource:///org/gnome/shell/ui/panel.js';
 

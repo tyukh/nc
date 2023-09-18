@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- org.gnome.shell.extensions.nc.gschema.xml
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ * SPDX-FileCopyrightText: 2023 Roman Tyukh
+ *
+-->
 <!DOCTYPE schemalist SYSTEM "gschema.dtd">
 <schemalist>
   <enum id="org.gnome.shell.extensions.nc.enum-order">
-    <value value="0" nick="first"/>    
-    <value value="-1" nick="last"/>    
+    <value value="0" nick="first" />
+    <value value="-1" nick="last" />
   </enum>
   <schema id="org.gnome.shell.extensions.nc" path="/org/gnome/shell/extensions/nc/">
     <!-- See also: https://docs.gtk.org/glib/gvariant-format-strings.html -->
@@ -12,9 +18,9 @@
     </key>
     <key name="position" type="s">
       <choices>
-        <choice value="left"/>
-        <choice value="center"/>
-        <choice value="right"/>
+        <choice value="left" />
+        <choice value="center" />
+        <choice value="right" />
       </choices>
       <default>"center"</default>
     </key>

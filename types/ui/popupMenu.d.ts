@@ -1,3 +1,10 @@
+/* popupMenu.d.ts
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ * SPDX-FileCopyrightText: 2023 Roman Tyukh
+ *
+ */
+
 declare module 'resource:///org/gnome/shell/ui/popupMenu.js' {
   import Clutter from 'gi://Clutter';
   import St from 'gi://St';
