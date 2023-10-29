@@ -9,7 +9,7 @@
 
 import Gio from 'gi://Gio';
 
-import NCInterface from './interface.js';
+import NCInterface from './modules/extension.interface.js';
 
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 

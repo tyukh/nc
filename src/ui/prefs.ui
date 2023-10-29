@@ -16,7 +16,7 @@
     <property name="upper">1</property>
     <property name="step-increment">1</property>
   </object>
-  <template class="PreferencesInterface" parent="AdwPreferencesPage">
+  <template class="NCPrefsInterface" parent="AdwPreferencesPage">
     <property name="icon-name">org.gnome.Settings-symbolic</property>
     <property name="name">preferences</property>
     <property name="title" translatable="yes">Preferences</property>

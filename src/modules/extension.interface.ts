@@ -1,4 +1,4 @@
-/* interface.ts
+/* extension.interface.ts
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
  * SPDX-FileCopyrightText: 2023 Roman Tyukh
@@ -16,17 +16,17 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
-// const Processor = Me.imports.calculator.processor;
+import {NCKeyCode} from './extension.common.js';
 
-interface KeyConstructorProperties extends St.Button.ConstructorProperties {
+interface NCInterfaceKeyConstructorProperties extends St.Button.ConstructorProperties {
   key_id?: number | null;
 }
 
-class Key extends St.Button {
-  private _keyId!: number | null;
+class NCInterfaceKey extends St.Button {
   static {
     GObject.registerClass(
       {
+        GTypeName: 'NCInterfaceKey',
         Properties: {
           'key-id': GObject.ParamSpec.uint(
             'key-id',
@@ -43,7 +43,9 @@ class Key extends St.Button {
     );
   }
 
-  constructor(params?: Partial<KeyConstructorProperties>) {
+  private _keyId!: number | null;
+
+  constructor(params?: Partial<NCInterfaceKeyConstructorProperties>) {
     super(params);
   }
 
@@ -57,12 +59,24 @@ class Key extends St.Button {
   }
 }
 
-export default class NCInterface {
+export default class NCInterface extends GObject.Object {
+  static {
+    GObject.registerClass(
+      {
+        GTypeName: 'NCInterface',
+        Signals: {
+          'key-signal': {
+            param_types: [GObject.TYPE_INT],
+          },
+        },
+      },
+      this
+    );
+  }
   private _button: PanelMenu.Button | null;
   private readonly _menu: PopupMenu.PopupMenu;
-  // private readonly _processor: Processor.Processor;
 
-  private _x1RegisterLabel!: St.Label;
+  private _x0RegisterLabel!: St.Label;
   private _tRegisterLabel!: St.Label;
   private _zRegisterLabel!: St.Label;
   private _yRegisterLabel!: St.Label;
@@ -76,10 +90,9 @@ export default class NCInterface {
     private _position: string,
     private _order: number
   ) {
+    super();
     this._button = new PanelMenu.Button(0.0, _(`${this._extension.uuid} Indicator`));
     this._menu = this._button.menu;
-
-    // this._processor = new Processor.Processor();
 
     this._button.add_child(
       new St.Icon({
@@ -112,7 +125,7 @@ export default class NCInterface {
 
   private _initControls(menu: PopupMenu.PopupMenu, font: string): void {
     // -- Init Stack
-    const stackArea = new PopupMenu.PopupSubMenuMenuItem(_('Stack registers'), false);
+    const stackArea = new PopupMenu.PopupSubMenuMenuItem(_('Stack'), false);
     stackArea.setOrnament(PopupMenu.Ornament.HIDDEN);
     this._initStack(stackArea, font);
 
@@ -138,6 +151,7 @@ export default class NCInterface {
 
     // -- Init Popup
     menu.addMenuItem(stackArea);
+    menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
     menu.addMenuItem(indicatorArea);
     menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
     menu.addMenuItem(keyboardArea);
@@ -163,7 +177,7 @@ export default class NCInterface {
       style_class: 'NC-stack2BoxLayout',
     });
 
-    function addRegister(stackBox: St.BoxLayout, label: string, font: string): St.Label {
+    function __addRegister(stackBox: St.BoxLayout, label: string, font: string): St.Label {
       const box = new St.BoxLayout({
         vertical: false,
         x_expand: true,
@@ -212,11 +226,11 @@ export default class NCInterface {
       return value;
     }
 
-    this._x1RegisterLabel = addRegister(stack1Box, 'X\u{2081}', font);
-    this._tRegisterLabel = addRegister(stack2Box, 'T', font);
-    this._zRegisterLabel = addRegister(stack2Box, 'Z', font);
-    this._yRegisterLabel = addRegister(stack2Box, 'Y', font);
-    this._xRegisterLabel = addRegister(stack2Box, 'X', font);
+    this._tRegisterLabel = __addRegister(stack1Box, 'T', font);
+    this._zRegisterLabel = __addRegister(stack1Box, 'Z', font);
+    this._yRegisterLabel = __addRegister(stack1Box, 'Y', font);
+    this._xRegisterLabel = __addRegister(stack1Box, 'X', font);
+    this._x0RegisterLabel = __addRegister(stack2Box, 'X\u{2070}', font);
 
     stackArea.menu.box.add(stack1Box);
     stackArea.menu.box.add(new PopupMenu.PopupSeparatorMenuItem());
@@ -276,10 +290,10 @@ export default class NCInterface {
     const Glyph: Readonly<Record<string, string>> = {
       NONE: '',
 
-      MODE_EE: _('EE'),
       MODE_F: 'F',
       MODE_K: 'K',
-      MODE_E: _('E'),
+      MODE_M_TO_X: _('M\u{2192}x'),
+      MODE_X_TO_M: _('x\u{2192}M'),
 
       ZERO: '0',
       ONE: '1',
@@ -337,21 +351,11 @@ export default class NCInterface {
       {
         keys: [
           {
-            id: 1, // Processor.Processor.Key.F,
-            label: Glyph.MODE_F,
+            id: NCKeyCode.RESERVED_NULL,
+            label: Glyph.NONE,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
-            style_class: 'NC-yellowButton',
-          },
-          {
-            id: 2, // Processor.Processor.Key.K,
-            label: Glyph.MODE_K,
-            labelF: Glyph.NONE,
-            labelK: Glyph.NONE,
-            style_class: 'NC-blueButton',
-          },
-          {
-            id: 0, // Processor.Processor.Key.RESERVED_NULL,
+            style_class: '',
           },
         ],
         labels: false,
@@ -359,35 +363,43 @@ export default class NCInterface {
       {
         keys: [
           {
-            id: 3, // Processor.Processor.Key.SEVEN,
+            id: NCKeyCode.RESERVED_NULL + 1,
+            label: Glyph.MODE_F,
+            labelF: Glyph.NONE,
+            labelK: Glyph.NONE,
+            style_class: 'NC-yellowButton',
+          },
+
+          {
+            id: NCKeyCode.SEVEN,
             label: Glyph.SEVEN,
             labelF: Glyph.OP_SINE,
             labelK: Glyph.OP_INTEGER,
             style_class: 'NC-grayButton',
           },
           {
-            id: 4, // Processor.Processor.Key.EIGHT,
+            id: NCKeyCode.EIGHT,
             label: Glyph.EIGHT,
             labelF: Glyph.OP_COSINE,
             labelK: Glyph.OP_DECIMAL,
             style_class: 'NC-grayButton',
           },
           {
-            id: 5, // Processor.Processor.Key.NINE,
+            id: NCKeyCode.NINE,
             label: Glyph.NINE,
             labelF: Glyph.OP_TANGENT,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 6, // Processor.Processor.Key.MINUS,
+            id: NCKeyCode.MINUS,
             label: Glyph.OP_SUBTRACT,
             labelF: Glyph.OP_SQRT,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 7, // Processor.Processor.Key.DIVIDE,
+            id: NCKeyCode.DIVIDE,
             label: Glyph.OP_DIVIDE,
             labelF: Glyph.OP_1_DIV_X,
             labelK: Glyph.NONE,
@@ -399,35 +411,42 @@ export default class NCInterface {
       {
         keys: [
           {
-            id: 8, // Processor.Processor.Key.FOUR,
+            id: NCKeyCode.RESERVED_NULL + 2,
+            label: Glyph.MODE_K,
+            labelF: Glyph.NONE,
+            labelK: Glyph.NONE,
+            style_class: 'NC-blueButton',
+          },
+          {
+            id: NCKeyCode.FOUR,
             label: Glyph.FOUR,
             labelF: Glyph.OP_ARCSINE,
             labelK: Glyph.OP_ABSOLUTE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 9, // Processor.Processor.Key.FIVE,
+            id: NCKeyCode.FIVE,
             label: Glyph.FIVE,
             labelF: Glyph.OP_ARCCOSINE,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 10, // Processor.Processor.Key.SIX,
+            id: NCKeyCode.SIX,
             label: Glyph.SIX,
             labelF: Glyph.OP_ARCTANGENT,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 11, // Processor.Processor.Key.PLUS,
+            id: NCKeyCode.PLUS,
             label: Glyph.OP_ADD,
             labelF: Glyph.PI,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 12, // Processor.Processor.Key.MULTIPLY,
+            id: NCKeyCode.MULTIPLY,
             label: Glyph.OP_MULTIPLY,
             labelF: Glyph.OP_X_SQ,
             labelK: Glyph.NONE,
@@ -439,35 +458,42 @@ export default class NCInterface {
       {
         keys: [
           {
-            id: 13, // Processor.Processor.Key.ONE,
+            id: NCKeyCode.RESERVED_NULL + 3,
+            label: Glyph.MODE_M_TO_X,
+            labelF: Glyph.NONE,
+            labelK: Glyph.NONE,
+            style_class: 'NC-darkgrayButton',
+          },
+          {
+            id: NCKeyCode.ONE,
             label: Glyph.ONE,
             labelF: Glyph.OP_E_POW_X,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 14, // Processor.Processor.Key.TWO,
+            id: NCKeyCode.TWO,
             label: Glyph.TWO,
             labelF: Glyph.OP_LG,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 15, // Processor.Processor.Key.THREE,
+            id: NCKeyCode.THREE,
             label: Glyph.THREE,
             labelF: Glyph.OP_LN,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 16, // Processor.Processor.Key.SWAP,
+            id: NCKeyCode.SWAP,
             label: Glyph.OP_SWAP,
             labelF: Glyph.OP_X_POW_Y,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 17, // Processor.Processor.Key.PUSH,
+            id: NCKeyCode.PUSH,
             label: Glyph.OP_PUSH_X,
             labelF: Glyph.OP_BACK_X,
             labelK: Glyph.NONE,
@@ -479,35 +505,43 @@ export default class NCInterface {
       {
         keys: [
           {
-            id: 18, // Processor.Processor.Key.ZERO,
+            id: NCKeyCode.RESERVED_NULL + 4,
+            label: Glyph.MODE_X_TO_M,
+            labelF: Glyph.NONE,
+            labelK: Glyph.NONE,
+            style_class: 'NC-darkgrayButton',
+          },
+
+          {
+            id: NCKeyCode.ZERO,
             label: Glyph.ZERO,
             labelF: Glyph.OP_TEN_POW_X,
             labelK: Glyph.OP_NOP,
             style_class: 'NC-grayButton',
           },
           {
-            id: 19, // Processor.Processor.Key.POINT,
+            id: NCKeyCode.POINT,
             label: Glyph.POINT,
             labelF: Glyph.OP_CIRCLE,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 20, // Processor.Processor.Key.SIGN,
+            id: NCKeyCode.SIGN,
             label: Glyph.SIGN,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 21, // Processor.Processor.Key.ENTER_E,
+            id: NCKeyCode.ENTER_E,
             label: Glyph.OP_ENTER_EXPONENT,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: 22, // Processor.Processor.Key.CLEAR_X,
+            id: NCKeyCode.CLEAR_X,
             label: Glyph.OP_CLEAR_X,
             labelF: Glyph.OP_CLEAR_F,
             labelK: Glyph.NONE,
@@ -550,8 +584,8 @@ export default class NCInterface {
       });
 
       row.keys.forEach((key) => {
-        if (key.id !== 0 /*Processor.Processor.Key.RESERVED_NULL*/) {
-          const keyButton = new Key({
+        if (key.id !== NCKeyCode.RESERVED_NULL) {
+          const keyButton = new NCInterfaceKey({
             label: key.label,
             style_class: key.style_class,
             x_expand: false,
@@ -742,9 +776,9 @@ export default class NCInterface {
       }
     } */
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private _onKeyboardDispatcher(button: typeof Key): void {
+  private _onKeyboardDispatcher(button: NCInterfaceKey): void {
     // this._processor.keyPressed(button.keyId);
+    this.emit('key-signal', button.keyId);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
