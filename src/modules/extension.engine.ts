@@ -1,4 +1,4 @@
-import {Decimal} from '../decimal.js/decimal.js';
+import {Decimal} from '../libs/decimal.js/decimal.js';
 
 export class NCEngine {
   private _x: Decimal;
