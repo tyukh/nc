@@ -1,3 +1,0 @@
-[submodule "src/decimal.js"]
-	path = src/decimal.js
-	url = https://github.com/MikeMcl/decimal.js
