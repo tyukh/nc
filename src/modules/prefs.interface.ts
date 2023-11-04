@@ -26,7 +26,7 @@ export default class NCPrefsInterface extends Adw.PreferencesPage {
           .get_parent()!
           .get_parent()!
           .get_child('ui')
-          .get_child('prefs.ui')
+          .get_child('prefs.interface.ui')
           .get_uri()!,
         InternalChildren: ['font', 'position', 'order'],
       },

@@ -2,46 +2,39 @@
 
 import gulp from 'gulp';
 import ts from 'gulp-typescript';
-// import sourcemaps from 'gulp-sourcemaps';
 import newer from 'gulp-newer';
+import zip from 'gulp-zip';
+import shell from 'gulp-shell';
+
+const uid = 'nc@tyukh.github.io';
+const sources = './src';
+const build = './build';
+const pack = `${uid}.zip`;
 
 const paths = {
-  libs: [
-    './src/libs/**/*',
-    '!./src/libs/decimal.js/doc/**',
-    '!./src/libs/decimal.js/test/**',
-    '!./src/libs/decimal.js/.*',
-    '!./src/libs/decimal.js/*.ts',
-    '!./src/libs/decimal.js/*.mjs',
-    '!./src/libs/decimal.js/*.json',
-    '!./src/libs/decimal.js/CHANGELOG.md',
+  src: [
+    `${sources}/{{metadata.json,stylesheet.css},ui/**/*,schemas/*.xml,libs/decimal.js/{decimal.js,*.md}}`,
   ],
-  files: [
-    './src/**/*',
-    '!./src/libs{,/**/*}',
-    '!./src/modules{,/**/*}',
-    '!./src/schemas{,/**/*}',
-    '!./src/*.ts',
-    '!./src/tsconfig.json',
-  ],
-  schemas: ['./src/schemas/**/*.xml'],
-  build: './build/nc@tyukh.github.io',
+  dst: `${build}/${uid}`,
   tsProject: './src/tsconfig.json',
 };
 
 const tsProject = ts.createProject(paths.tsProject);
 
-gulp.task('compile-ts', function () {
-  return tsProject.src().pipe(tsProject()).js.pipe(gulp.dest(paths.build));
+gulp.task('transpile', () => {
+  return tsProject.src().pipe(tsProject()).js.pipe(gulp.dest(paths.dst));
 });
 
-gulp.task('copy-libs', function () {
-  return gulp
-    .src(paths.libs)
-    .pipe(newer(`${paths.build}/libs`))
-    .pipe(gulp.dest(`${paths.build}/libs`));
+gulp.task('copy', () => {
+  return gulp.src(paths.src).pipe(newer(paths.dst)).pipe(gulp.dest(paths.dst));
 });
 
-gulp.task('copy-files', function () {
-  return gulp.src(paths.files).pipe(newer(paths.build)).pipe(gulp.dest(paths.build));
+gulp.task('zip', () => {
+  return gulp.src(`${paths.dst}/**/*`).pipe(zip(pack)).pipe(gulp.dest(build));
 });
+
+gulp.task('install', shell.task(`gnome-extensions install ${build}/${pack} --force`));
+
+gulp.task('build', gulp.series(gulp.parallel('copy', 'transpile'), 'zip'));
+
+gulp.task('deploy', gulp.series('build', 'install'));

@@ -36,6 +36,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@gi-types/st1", "npm:1.0.1"],\
             ["@types/gulp", "npm:4.0.13"],\
             ["@types/gulp-newer", "npm:1.4.2"],\
+            ["@types/gulp-zip", "npm:4.0.3"],\
             ["@types/node", "npm:20.6.0"],\
             ["@typescript-eslint/eslint-plugin", "virtual:05381c12ed1dddc2f2ec406ea4468f791437e38b3660e82d4ee2e9f76eb7e3aaea83d6925e790b8b9b92a439dfa7eb97687bf932d5676218640f30d4a912387f#npm:6.6.0"],\
             ["@typescript-eslint/parser", "virtual:05381c12ed1dddc2f2ec406ea4468f791437e38b3660e82d4ee2e9f76eb7e3aaea83d6925e790b8b9b92a439dfa7eb97687bf932d5676218640f30d4a912387f#npm:6.6.0"],\
@@ -47,7 +48,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["gulp", "npm:4.0.2"],\
             ["gulp-cli", "npm:2.3.0"],\
             ["gulp-newer", "npm:1.4.0"],\
+            ["gulp-shell", "npm:0.8.0"],\
             ["gulp-typescript", "virtual:05381c12ed1dddc2f2ec406ea4468f791437e38b3660e82d4ee2e9f76eb7e3aaea83d6925e790b8b9b92a439dfa7eb97687bf932d5676218640f30d4a912387f#npm:6.0.0-alpha.1"],\
+            ["gulp-zip", "virtual:05381c12ed1dddc2f2ec406ea4468f791437e38b3660e82d4ee2e9f76eb7e3aaea83d6925e790b8b9b92a439dfa7eb97687bf932d5676218640f30d4a912387f#npm:5.1.0"],\
             ["prettier", "npm:3.0.3"],\
             ["ts-node", "virtual:05381c12ed1dddc2f2ec406ea4468f791437e38b3660e82d4ee2e9f76eb7e3aaea83d6925e790b8b9b92a439dfa7eb97687bf932d5676218640f30d4a912387f#npm:10.9.1"],\
             ["typescript", "patch:typescript@npm%3A5.2.2#~builtin<compat/typescript>::version=5.2.2&hash=f3b441"]\
@@ -673,6 +676,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-gulp-newer-npm-1.4.2-5fb5189fc7-a52730211d.zip/node_modules/@types/gulp-newer/",\
           "packageDependencies": [\
             ["@types/gulp-newer", "npm:1.4.2"],\
+            ["@types/node", "npm:20.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/gulp-zip", [\
+        ["npm:4.0.3", {\
+          "packageLocation": "./.yarn/cache/@types-gulp-zip-npm-4.0.3-6b8f5c190f-725d76d08b.zip/node_modules/@types/gulp-zip/",\
+          "packageDependencies": [\
+            ["@types/gulp-zip", "npm:4.0.3"],\
             ["@types/node", "npm:20.6.0"]\
           ],\
           "linkType": "HARD"\
@@ -1768,6 +1781,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["braces", "npm:3.0.2"],\
             ["fill-range", "npm:7.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["buffer-crc32", [\
+        ["npm:0.2.13", {\
+          "packageLocation": "./.yarn/cache/buffer-crc32-npm-0.2.13-c4b6fceac1-06252347ae.zip/node_modules/buffer-crc32/",\
+          "packageDependencies": [\
+            ["buffer-crc32", "npm:0.2.13"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -3608,6 +3630,21 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["gulp-shell", [\
+        ["npm:0.8.0", {\
+          "packageLocation": "./.yarn/cache/gulp-shell-npm-0.8.0-72834dc949-fa5224d427.zip/node_modules/gulp-shell/",\
+          "packageDependencies": [\
+            ["gulp-shell", "npm:0.8.0"],\
+            ["chalk", "npm:3.0.0"],\
+            ["fancy-log", "npm:1.3.3"],\
+            ["lodash.template", "npm:4.5.0"],\
+            ["plugin-error", "npm:1.0.1"],\
+            ["through2", "npm:3.0.2"],\
+            ["tslib", "npm:1.14.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["gulp-typescript", [\
         ["npm:6.0.0-alpha.1", {\
           "packageLocation": "./.yarn/cache/gulp-typescript-npm-6.0.0-alpha.1-98557634b8-caa18f2fc0.zip/node_modules/gulp-typescript/",\
@@ -3632,6 +3669,33 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packagePeers": [\
             "@types/typescript",\
             "typescript"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["gulp-zip", [\
+        ["npm:5.1.0", {\
+          "packageLocation": "./.yarn/cache/gulp-zip-npm-5.1.0-bcff69742d-2ba52161f4.zip/node_modules/gulp-zip/",\
+          "packageDependencies": [\
+            ["gulp-zip", "npm:5.1.0"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:05381c12ed1dddc2f2ec406ea4468f791437e38b3660e82d4ee2e9f76eb7e3aaea83d6925e790b8b9b92a439dfa7eb97687bf932d5676218640f30d4a912387f#npm:5.1.0", {\
+          "packageLocation": "./.yarn/__virtual__/gulp-zip-virtual-4b175b7967/0/cache/gulp-zip-npm-5.1.0-bcff69742d-2ba52161f4.zip/node_modules/gulp-zip/",\
+          "packageDependencies": [\
+            ["gulp-zip", "virtual:05381c12ed1dddc2f2ec406ea4468f791437e38b3660e82d4ee2e9f76eb7e3aaea83d6925e790b8b9b92a439dfa7eb97687bf932d5676218640f30d4a912387f#npm:5.1.0"],\
+            ["@types/gulp", "npm:4.0.13"],\
+            ["get-stream", "npm:5.2.0"],\
+            ["gulp", "npm:4.0.2"],\
+            ["plugin-error", "npm:1.0.1"],\
+            ["through2", "npm:3.0.2"],\
+            ["vinyl", "npm:2.2.1"],\
+            ["yazl", "npm:2.5.1"]\
+          ],\
+          "packagePeers": [\
+            "@types/gulp",\
+            "gulp"\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4547,11 +4611,41 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["lodash._reinterpolate", [\
+        ["npm:3.0.0", {\
+          "packageLocation": "./.yarn/cache/lodash._reinterpolate-npm-3.0.0-3c62ca439e-06d2d5f331.zip/node_modules/lodash._reinterpolate/",\
+          "packageDependencies": [\
+            ["lodash._reinterpolate", "npm:3.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["lodash.merge", [\
         ["npm:4.6.2", {\
           "packageLocation": "./.yarn/cache/lodash.merge-npm-4.6.2-77cb4416bf-ad580b4bdb.zip/node_modules/lodash.merge/",\
           "packageDependencies": [\
             ["lodash.merge", "npm:4.6.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["lodash.template", [\
+        ["npm:4.5.0", {\
+          "packageLocation": "./.yarn/cache/lodash.template-npm-4.5.0-5272df3039-ca64e5f07b.zip/node_modules/lodash.template/",\
+          "packageDependencies": [\
+            ["lodash.template", "npm:4.5.0"],\
+            ["lodash._reinterpolate", "npm:3.0.0"],\
+            ["lodash.templatesettings", "npm:4.2.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["lodash.templatesettings", [\
+        ["npm:4.2.0", {\
+          "packageLocation": "./.yarn/cache/lodash.templatesettings-npm-4.2.0-15fbdebcf4-863e025478.zip/node_modules/lodash.templatesettings/",\
+          "packageDependencies": [\
+            ["lodash.templatesettings", "npm:4.2.0"],\
+            ["lodash._reinterpolate", "npm:3.0.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4955,6 +5049,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@gi-types/st1", "npm:1.0.1"],\
             ["@types/gulp", "npm:4.0.13"],\
             ["@types/gulp-newer", "npm:1.4.2"],\
+            ["@types/gulp-zip", "npm:4.0.3"],\
             ["@types/node", "npm:20.6.0"],\
             ["@typescript-eslint/eslint-plugin", "virtual:05381c12ed1dddc2f2ec406ea4468f791437e38b3660e82d4ee2e9f76eb7e3aaea83d6925e790b8b9b92a439dfa7eb97687bf932d5676218640f30d4a912387f#npm:6.6.0"],\
             ["@typescript-eslint/parser", "virtual:05381c12ed1dddc2f2ec406ea4468f791437e38b3660e82d4ee2e9f76eb7e3aaea83d6925e790b8b9b92a439dfa7eb97687bf932d5676218640f30d4a912387f#npm:6.6.0"],\
@@ -4966,7 +5061,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["gulp", "npm:4.0.2"],\
             ["gulp-cli", "npm:2.3.0"],\
             ["gulp-newer", "npm:1.4.0"],\
+            ["gulp-shell", "npm:0.8.0"],\
             ["gulp-typescript", "virtual:05381c12ed1dddc2f2ec406ea4468f791437e38b3660e82d4ee2e9f76eb7e3aaea83d6925e790b8b9b92a439dfa7eb97687bf932d5676218640f30d4a912387f#npm:6.0.0-alpha.1"],\
+            ["gulp-zip", "virtual:05381c12ed1dddc2f2ec406ea4468f791437e38b3660e82d4ee2e9f76eb7e3aaea83d6925e790b8b9b92a439dfa7eb97687bf932d5676218640f30d4a912387f#npm:5.1.0"],\
             ["prettier", "npm:3.0.3"],\
             ["ts-node", "virtual:05381c12ed1dddc2f2ec406ea4468f791437e38b3660e82d4ee2e9f76eb7e3aaea83d6925e790b8b9b92a439dfa7eb97687bf932d5676218640f30d4a912387f#npm:10.9.1"],\
             ["typescript", "patch:typescript@npm%3A5.2.2#~builtin<compat/typescript>::version=5.2.2&hash=f3b441"]\
@@ -6743,6 +6840,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["tslib", [\
+        ["npm:1.14.1", {\
+          "packageLocation": "./.yarn/cache/tslib-npm-1.14.1-102499115e-dbe628ef87.zip/node_modules/tslib/",\
+          "packageDependencies": [\
+            ["tslib", "npm:1.14.1"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
         ["npm:2.6.2", {\
           "packageLocation": "./.yarn/cache/tslib-npm-2.6.2-4fc8c068d9-329ea56123.zip/node_modules/tslib/",\
           "packageDependencies": [\
@@ -7198,6 +7302,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["yargs-parser", "npm:5.0.1"],\
             ["camelcase", "npm:3.0.0"],\
             ["object.assign", "npm:4.1.4"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["yazl", [\
+        ["npm:2.5.1", {\
+          "packageLocation": "./.yarn/cache/yazl-npm-2.5.1-07fc697bef-daec5154b5.zip/node_modules/yazl/",\
+          "packageDependencies": [\
+            ["yazl", "npm:2.5.1"],\
+            ["buffer-crc32", "npm:0.2.13"]\
           ],\
           "linkType": "HARD"\
         }]\
