@@ -16,7 +16,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
-import {NCKeyCode} from './extension.common.js';
+import {NCOpCode} from './extension.common.js';
 
 interface NCInterfaceKeyConstructorProperties extends St.Button.ConstructorProperties {
   key_id?: number | null;
@@ -351,7 +351,7 @@ export default class NCInterface extends GObject.Object {
       {
         keys: [
           {
-            id: NCKeyCode.RESERVED_NULL,
+            id: NCOpCode.RESERVED_NULL,
             label: Glyph.NONE,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
@@ -363,7 +363,7 @@ export default class NCInterface extends GObject.Object {
       {
         keys: [
           {
-            id: NCKeyCode.RESERVED_NULL + 1,
+            id: NCOpCode.RESERVED_NULL + 1,
             label: Glyph.MODE_F,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
@@ -371,35 +371,35 @@ export default class NCInterface extends GObject.Object {
           },
 
           {
-            id: NCKeyCode.SEVEN,
+            id: NCOpCode.SEVEN,
             label: Glyph.SEVEN,
             labelF: Glyph.OP_SINE,
             labelK: Glyph.OP_INTEGER,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.EIGHT,
+            id: NCOpCode.EIGHT,
             label: Glyph.EIGHT,
             labelF: Glyph.OP_COSINE,
             labelK: Glyph.OP_DECIMAL,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.NINE,
+            id: NCOpCode.NINE,
             label: Glyph.NINE,
             labelF: Glyph.OP_TANGENT,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.MINUS,
+            id: NCOpCode.MINUS,
             label: Glyph.OP_SUBTRACT,
             labelF: Glyph.OP_SQRT,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.DIVIDE,
+            id: NCOpCode.DIVIDE,
             label: Glyph.OP_DIVIDE,
             labelF: Glyph.OP_1_DIV_X,
             labelK: Glyph.NONE,
@@ -411,42 +411,42 @@ export default class NCInterface extends GObject.Object {
       {
         keys: [
           {
-            id: NCKeyCode.RESERVED_NULL + 2,
+            id: NCOpCode.RESERVED_NULL + 2,
             label: Glyph.MODE_K,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
             style_class: 'NC-blueButton',
           },
           {
-            id: NCKeyCode.FOUR,
+            id: NCOpCode.FOUR,
             label: Glyph.FOUR,
             labelF: Glyph.OP_ARCSINE,
             labelK: Glyph.OP_ABSOLUTE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.FIVE,
+            id: NCOpCode.FIVE,
             label: Glyph.FIVE,
             labelF: Glyph.OP_ARCCOSINE,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.SIX,
+            id: NCOpCode.SIX,
             label: Glyph.SIX,
             labelF: Glyph.OP_ARCTANGENT,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.PLUS,
+            id: NCOpCode.PLUS,
             label: Glyph.OP_ADD,
             labelF: Glyph.PI,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.MULTIPLY,
+            id: NCOpCode.MULTIPLY,
             label: Glyph.OP_MULTIPLY,
             labelF: Glyph.OP_X_SQ,
             labelK: Glyph.NONE,
@@ -458,42 +458,42 @@ export default class NCInterface extends GObject.Object {
       {
         keys: [
           {
-            id: NCKeyCode.RESERVED_NULL + 3,
+            id: NCOpCode.RESERVED_NULL + 3,
             label: Glyph.MODE_M_TO_X,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
             style_class: 'NC-darkgrayButton',
           },
           {
-            id: NCKeyCode.ONE,
+            id: NCOpCode.ONE,
             label: Glyph.ONE,
             labelF: Glyph.OP_E_POW_X,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.TWO,
+            id: NCOpCode.TWO,
             label: Glyph.TWO,
             labelF: Glyph.OP_LG,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.THREE,
+            id: NCOpCode.THREE,
             label: Glyph.THREE,
             labelF: Glyph.OP_LN,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.SWAP,
+            id: NCOpCode.SWAP,
             label: Glyph.OP_SWAP,
             labelF: Glyph.OP_X_POW_Y,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.PUSH,
+            id: NCOpCode.PUSH,
             label: Glyph.OP_PUSH_X,
             labelF: Glyph.OP_BACK_X,
             labelK: Glyph.NONE,
@@ -505,7 +505,7 @@ export default class NCInterface extends GObject.Object {
       {
         keys: [
           {
-            id: NCKeyCode.RESERVED_NULL + 4,
+            id: NCOpCode.RESERVED_NULL + 4,
             label: Glyph.MODE_X_TO_M,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
@@ -513,35 +513,35 @@ export default class NCInterface extends GObject.Object {
           },
 
           {
-            id: NCKeyCode.ZERO,
+            id: NCOpCode.ZERO,
             label: Glyph.ZERO,
             labelF: Glyph.OP_TEN_POW_X,
             labelK: Glyph.OP_NOP,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.POINT,
+            id: NCOpCode.POINT,
             label: Glyph.POINT,
             labelF: Glyph.OP_CIRCLE,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.SIGN,
+            id: NCOpCode.SIGN,
             label: Glyph.SIGN,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.ENTER_E,
+            id: NCOpCode.ENTER_E,
             label: Glyph.OP_ENTER_EXPONENT,
             labelF: Glyph.NONE,
             labelK: Glyph.NONE,
             style_class: 'NC-grayButton',
           },
           {
-            id: NCKeyCode.CLEAR_X,
+            id: NCOpCode.CLEAR_X,
             label: Glyph.OP_CLEAR_X,
             labelF: Glyph.OP_CLEAR_F,
             labelK: Glyph.NONE,
@@ -584,7 +584,7 @@ export default class NCInterface extends GObject.Object {
       });
 
       row.keys.forEach((key) => {
-        if (key.id !== NCKeyCode.RESERVED_NULL) {
+        if (key.id !== NCOpCode.RESERVED_NULL) {
           const keyButton = new NCInterfaceKey({
             label: key.label,
             style_class: key.style_class,
@@ -718,6 +718,10 @@ export default class NCInterface extends GObject.Object {
       return string[0].concat(exp);
     }
     return string[0];
+  }
+
+  public mantissaHandler(_sender: GObject.Object, value: string): void {
+    this._mantissaIndicatorLabel.set_text(value);
   }
 
   /* private _onIndicatorSet(indicator: number, value: string): void {

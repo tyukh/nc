@@ -10,6 +10,7 @@
 import Gio from 'gi://Gio';
 
 import NCInterface from './modules/extension.interface.js';
+import NCLogic from './modules/extension.logic.js';
 
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
@@ -20,7 +21,11 @@ export default class NCExtension extends Extension {
   private _position: string;
   private _order: number;
 
-  private _interface!: NCInterface | null;
+  private _interface: NCInterface | null;
+  private _logic: NCLogic | null;
+
+  private _keySignalId!: number;
+  private _mantissaSignalId!: number;
 
   /**
    * This class is constructed once when your extension is loaded, not
@@ -34,6 +39,9 @@ export default class NCExtension extends Extension {
    */
   constructor(metadata: object) {
     super(metadata);
+
+    this._interface = null;
+    this._logic = null;
 
     this._settings = this.getSettings();
 
@@ -55,6 +63,19 @@ export default class NCExtension extends Extension {
    */
   public enable(): void {
     this._interface = new NCInterface(this, this._font, this._position, this._order);
+    if (this._logic === null) this._logic = new NCLogic();
+
+    // Connect signals
+    this._keySignalId = this._interface.connect(
+      'key-signal',
+      this._logic.keyHandler.bind(this._logic)
+    );
+    this._mantissaSignalId = this._logic.connect(
+      'mantissa-signal',
+      this._interface.mantissaHandler.bind(this._interface)
+    );
+
+    this._logic.synchronize();
   }
 
   /**
@@ -65,7 +86,13 @@ export default class NCExtension extends Extension {
    * Not doing so is the most common reason extensions are rejected in review!
    */
   public disable(): void {
-    this._interface?.destroy();
+    if (this._interface !== null) {
+      // Disconnect signals
+      this._logic?.disconnect(this._mantissaSignalId);
+      this._interface.disconnect(this._keySignalId);
+
+      this._interface.destroy();
+    }
     this._interface = null;
   }
 

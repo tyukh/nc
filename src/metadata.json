@@ -8,6 +8,6 @@
   "url": "https://github.com/tyukh/nc",
   "gettext-domain": "nc@tyukh.github.io",
   "settings-schema": "org.gnome.shell.extensions.nc",
-  "session-modes": ["user", "unlock-dialog"],
+  "session-modes": ["user"],
   "version": 1
 }

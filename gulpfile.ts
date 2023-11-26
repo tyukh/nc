@@ -5,6 +5,7 @@ import ts from 'gulp-typescript';
 import newer from 'gulp-newer';
 import zip from 'gulp-zip';
 import shell from 'gulp-shell';
+import rename from 'gulp-rename';
 
 const uid = 'nc@tyukh.github.io';
 const sources = './src';
@@ -13,11 +14,15 @@ const pack = `${uid}.zip`;
 
 const paths = {
   src: [
-    `${sources}/{{metadata.json,stylesheet.css},ui/**/*,schemas/*.xml,libs/decimal.js/{decimal.js,*.md}}`,
+    `${sources}/{{metadata.json,stylesheet.css},ui/**/*,schemas/*.xml,libs/decimal.js/{decimal.mjs,*.md}}`,
   ],
   dst: `${build}/${uid}`,
   tsProject: './src/tsconfig.json',
 };
+
+const extensions: Readonly<Map<string, string>> = new Map([
+    ['.mjs', '.js'],
+  ]);
 
 const tsProject = ts.createProject(paths.tsProject);
 
@@ -26,7 +31,10 @@ gulp.task('transpile', () => {
 });
 
 gulp.task('copy', () => {
-  return gulp.src(paths.src).pipe(newer(paths.dst)).pipe(gulp.dest(paths.dst));
+  return gulp.src(paths.src).pipe(newer(paths.dst)).pipe(rename((path) => {
+    const extname = extensions.get(path.extname);
+    if(extname !== undefined) path.extname = extname;
+  })).pipe(gulp.dest(paths.dst));
 });
 
 gulp.task('zip', () => {

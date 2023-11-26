@@ -43,44 +43,31 @@ export class NCEngine {
 
   // Stack & memory getters / setters
 
-  public set x(value: Decimal) {
-    this._x = value;
+  public set x(value: Decimal | string) {
+    this._x = new Decimal(value);
   }
 
   public get x(): Decimal {
     return this._x;
   }
 
-  public get y(): Decimal {
-    return this._y;
+  public registers(): {x: string; y: string; z: string; t: string; x0: string} {
+    return {
+      x: this._x.toString(),
+      y: this._y.toString(),
+      z: this._z.toString(),
+      t: this._t.toString(),
+      x0: this._x0.toString(),
+    };
   }
 
-  public get z(): Decimal {
-    return this._z;
-  }
-
-  public get t(): Decimal {
-    return this._t;
-  }
-
-  public get x0(): Decimal {
-    return this._x0;
-  }
-
-  public get m0(): Decimal {
-    return this._m0;
-  }
-
-  public get m1(): Decimal {
-    return this._m1;
-  }
-
-  public get m2(): Decimal {
-    return this._m2;
-  }
-
-  public get m3(): Decimal {
-    return this._m3;
+  public memory(): {m0: string; m1: string; m2: string; m3: string} {
+    return {
+      m0: this._m0.toString(),
+      m1: this._m1.toString(),
+      m2: this._m2.toString(),
+      m3: this._m3.toString(),
+    };
   }
 
   // Stack control OPs

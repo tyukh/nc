@@ -1,4 +1,4 @@
-export enum NCKeyCode {
+export const enum NCOpCode {
   ZERO = 0,
   ONE = 1,
   TWO = 2,
