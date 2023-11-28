@@ -4,7 +4,7 @@
   "license": "GPL-2.0-or-later",
   "type": "commonjs",
   "scripts": {
-    "lint": "yarn eslint --fix ./src",
+    "submodule": "git submodule init && git submodule update",
     "deploy": "yarn gulp deploy"
   },
   "devDependencies": {
