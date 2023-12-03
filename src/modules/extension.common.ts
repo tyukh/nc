@@ -28,3 +28,6 @@ export const enum NCOpCode {
 
   RESERVED_NULL = 9999,
 }
+
+export type NCRegisters = {x: string; y: string; z: string; t: string; x0: string};
+export type NCMemory = {m0: string; m1: string; m2: string; m3: string};

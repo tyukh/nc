@@ -17,6 +17,8 @@ declare module '@gi-types/gobject2' {
   interface GObject {
     connectObject(...args: []): void;
   }
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  let TYPE_JSOBJECT: GObject.GType<object>;
 }
 
 declare module '@gi-types/st1' {

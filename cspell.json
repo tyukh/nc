@@ -17,6 +17,7 @@
         "gobject",
         "gulpfile",
         "jscodeshift",
+        "JSOBJECT",
         "msgid",
         "ngettext",
         "numlock",

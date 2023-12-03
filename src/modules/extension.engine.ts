@@ -1,16 +1,21 @@
 import {Decimal} from '../libs/decimal.js/decimal.js';
+import type {NCRegisters, NCMemory} from './extension.common.js';
 
 export class NCEngine {
-  private _x: Decimal;
-  private _y: Decimal;
-  private _z: Decimal;
-  private _t: Decimal;
-  private _x0: Decimal;
+  private _register: {
+    x: Decimal;
+    y: Decimal;
+    z: Decimal;
+    t: Decimal;
+    x0: Decimal;
+  };
 
-  private _m0: Decimal;
-  private _m1: Decimal;
-  private _m2: Decimal;
-  private _m3: Decimal;
+  private _memory: {
+    m0: Decimal;
+    m1: Decimal;
+    m2: Decimal;
+    m3: Decimal;
+  };
 
   public static readonly Precision = {
     MAX: 8,
@@ -29,88 +34,92 @@ export class NCEngine {
       toExpNeg: -1,
     });
 
-    this._x = new Decimal(0);
-    this._y = new Decimal(0);
-    this._z = new Decimal(0);
-    this._t = new Decimal(0);
-    this._x0 = new Decimal(0);
+    this._register = {
+      x: new Decimal(0),
+      y: new Decimal(0),
+      z: new Decimal(0),
+      t: new Decimal(0),
+      x0: new Decimal(0),
+    };
 
-    this._m0 = new Decimal(0);
-    this._m1 = new Decimal(0);
-    this._m2 = new Decimal(0);
-    this._m3 = new Decimal(0);
+    this._memory = {
+      m0: new Decimal(0),
+      m1: new Decimal(0),
+      m2: new Decimal(0),
+      m3: new Decimal(0),
+    };
   }
 
   // Stack & memory getters / setters
 
   public set x(value: Decimal | string) {
-    this._x = new Decimal(value);
+    this._register.x = new Decimal(value);
   }
 
-  public get x(): Decimal {
-    return this._x;
+  public get x(): string {
+    return this._register.x.toString();
   }
 
-  public registers(): {x: string; y: string; z: string; t: string; x0: string} {
+  public get registers(): NCRegisters {
     return {
-      x: this._x.toString(),
-      y: this._y.toString(),
-      z: this._z.toString(),
-      t: this._t.toString(),
-      x0: this._x0.toString(),
+      x: this._register.x.toString(),
+      y: this._register.y.toString(),
+      z: this._register.z.toString(),
+      t: this._register.t.toString(),
+      x0: this._register.x0.toString(),
     };
   }
 
-  public memory(): {m0: string; m1: string; m2: string; m3: string} {
+  public get memory(): NCMemory {
     return {
-      m0: this._m0.toString(),
-      m1: this._m1.toString(),
-      m2: this._m2.toString(),
-      m3: this._m3.toString(),
+      m0: this._memory.m0.toString(),
+      m1: this._memory.m1.toString(),
+      m2: this._memory.m2.toString(),
+      m3: this._memory.m3.toString(),
     };
   }
 
   // Stack control OPs
 
   public push(): void {
-    this._t = this._z;
-    this._z = this._y;
-    this._y = this._x;
+    this._register.t = this._register.z;
+    this._register.z = this._register.y;
+    this._register.y = this._register.x;
   }
 
   private pop(): void {
-    this._x0 = this._x;
-    this._x = this._y;
-    this._y = this._z;
-    this._z = this._t;
+    this._register.x0 = this._register.x;
+    this._register.x = this._register.y;
+    this._register.y = this._register.z;
+    this._register.z = this._register.t;
   }
 
   private save(): void {
-    this._x0 = this._x;
+    this._register.x0 = this._register.x;
   }
 
   public swap(): void {
-    const interchange = this._x;
-    this._x = this._y;
-    this._y = interchange;
+    const x = this._register.x;
+    this._register.x = this._register.y;
+    this._register.y = x;
   }
 
   public circulate(): void {
-    const interchange = this._x;
-    this._x = this._y;
-    this._y = this._z;
-    this._z = this._t;
-    this._t = interchange;
+    const x = this._register.x;
+    this._register.x = this._register.y;
+    this._register.y = this._register.z;
+    this._register.z = this._register.t;
+    this._register.t = x;
   }
 
   // Special unary OPs
 
   public negate() {
-    this._x = this._x.negated();
+    this._register.x = this._register.x.negated();
   }
 
   public clearX() {
-    this._x = new Decimal(0);
+    this._register.x = new Decimal(0);
   }
 
   // Unary OPs
@@ -121,7 +130,7 @@ export class NCEngine {
     let result: Decimal;
 
     try {
-      result = op(this._x, this._y);
+      result = op(this._register.x, this._register.y);
     } catch {
       return false;
     }
@@ -130,7 +139,7 @@ export class NCEngine {
 
     this.save();
     this.pop();
-    this._x = result;
+    this._register.x = result;
 
     return true;
   }

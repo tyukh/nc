@@ -26,6 +26,8 @@ export default class NCExtension extends Extension {
 
   private _keySignalId!: number;
   private _mantissaSignalId!: number;
+  private _exponentSignalId!: number;
+  private _registersSignalId!: number;
 
   /**
    * This class is constructed once when your extension is loaded, not
@@ -74,6 +76,14 @@ export default class NCExtension extends Extension {
       'mantissa-signal',
       this._interface.mantissaHandler.bind(this._interface)
     );
+    this._exponentSignalId = this._logic.connect(
+      'exponent-signal',
+      this._interface.exponentHandler.bind(this._interface)
+    );
+    this._registersSignalId = this._logic.connect(
+      'registers-signal',
+      this._interface.registersHandler.bind(this._interface)
+    );
 
     this._logic.synchronize();
   }
@@ -89,6 +99,8 @@ export default class NCExtension extends Extension {
     if (this._interface !== null) {
       // Disconnect signals
       this._logic?.disconnect(this._mantissaSignalId);
+      this._logic?.disconnect(this._exponentSignalId);
+      this._logic?.disconnect(this._registersSignalId);
       this._interface.disconnect(this._keySignalId);
 
       this._interface.destroy();

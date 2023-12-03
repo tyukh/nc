@@ -16,7 +16,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
-import {NCOpCode} from './extension.common.js';
+import {NCOpCode, type NCRegisters} from './extension.common.js';
 
 interface NCInterfaceKeyConstructorProperties extends St.Button.ConstructorProperties {
   key_id?: number | null;
@@ -125,7 +125,7 @@ export default class NCInterface extends GObject.Object {
 
   private _initControls(menu: PopupMenu.PopupMenu, font: string): void {
     // -- Init Stack
-    const stackArea = new PopupMenu.PopupSubMenuMenuItem(_('Stack'), false);
+    const stackArea = new PopupMenu.PopupSubMenuMenuItem(_('Registers'), false);
     stackArea.setOrnament(PopupMenu.Ornament.HIDDEN);
     this._initStack(stackArea, font);
 
@@ -722,6 +722,18 @@ export default class NCInterface extends GObject.Object {
 
   public mantissaHandler(_sender: GObject.Object, value: string): void {
     this._mantissaIndicatorLabel.set_text(value);
+  }
+
+  public exponentHandler(_sender: GObject.Object, value: string): void {
+    this._exponentIndicatorLabel.set_text(value);
+  }
+
+  public registersHandler(_sender: GObject.Object, value: NCRegisters): void {
+    this._xRegisterLabel.set_text(value.x);
+    this._yRegisterLabel.set_text(value.y);
+    this._zRegisterLabel.set_text(value.z);
+    this._tRegisterLabel.set_text(value.t);
+    this._x0RegisterLabel.set_text(value.x0);
   }
 
   /* private _onIndicatorSet(indicator: number, value: string): void {
