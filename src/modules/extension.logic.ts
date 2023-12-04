@@ -8,7 +8,7 @@
 'use strict';
 
 import GObject from 'gi://GObject';
-import {NCOpCode} from './extension.common.js';
+import {NCOpCode, type NCRegisters} from './extension.common.js';
 import {NCEngine} from './extension.engine.js';
 
 // import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -19,27 +19,16 @@ const enum NCLogicState {
   EXPONENT,
 }
 
-class NCNumber {
+class NCMantissa {
   private _integer: string = '0';
   private _point: string = '';
   private _fraction: string = '';
-  private _exponentSign: string = '';
-  private _exponent: string = '';
 
-  public get mantissa(): string {
+  public get digits(): string {
     return this._integer + this._point + this._fraction;
   }
 
-  public get exponent(): string {
-    return this._exponentSign + this._exponent;
-  }
-
-  public get number(): string {
-    if (this.exponent.length === 0) return this.mantissa;
-    return `${this.mantissa}e${this.exponent}`;
-  }
-
-  public set mantissa(digit: string | number) {
+  public set digits(digit: string | number) {
     switch (typeof digit) {
       case 'string':
         if (this._integer.length + this._fraction.length < NCEngine.Precision.MAX) {
@@ -60,10 +49,19 @@ class NCNumber {
   public set point(value: boolean) {
     this._point = value ? '.' : '';
   }
+}
 
-  public set exponent(digit: string | number | null) {
+class NCExponent {
+  private _sign: string = '';
+  private _exponent: string = '';
+
+  public get digits(): string {
+    return this._sign + this._exponent;
+  }
+
+  public set digits(digit: string | number | null) {
     if (digit === null) {
-      this._exponentSign = '';
+      this._sign = '';
       this._exponent = '';
     } else
       switch (typeof digit) {
@@ -73,15 +71,42 @@ class NCNumber {
 
         case 'number':
           if (digit === 0) {
-            this._exponentSign = '';
+            this._sign = '';
             this._exponent = ''.padStart(NCEngine.Precision.MAX_E, '0');
           }
           break;
       }
   }
 
-  public negateE(): void {
-    this._exponentSign = this._exponentSign === '-' ? '' : '-';
+  public get sign(): boolean {
+    return this._sign !== '-';
+  }
+
+  public set sign(value: boolean) {
+    this._sign = value ? '' : '-';
+  }
+}
+
+class NCNumber {
+  private _mantissa: NCMantissa;
+  private _exponent: NCExponent;
+
+  constructor() {
+    this._mantissa = new NCMantissa();
+    this._exponent = new NCExponent();
+  }
+
+  public get mantissa(): NCMantissa {
+    return this._mantissa;
+  }
+
+  public get exponent(): NCExponent {
+    return this._exponent;
+  }
+
+  public get digits(): string {
+    if (this._exponent.digits.length === 0) return this._mantissa.digits;
+    return `${this._mantissa.digits}e${this._exponent.digits}`;
   }
 }
 
@@ -134,54 +159,58 @@ export default class NCLogic extends GObject.Object {
     this._state = NCLogicState.MANTISSA;
   }
 
+  private _signal(name: string, value: string | NCRegisters): void {
+    this.emit(name, value);
+  }
+
   public synchronize(): void {
-    this.emit('mantissa-signal', this._number.mantissa);
-    this.emit('exponent-signal', this._number.exponent);
-    this.emit('registers-signal', this._engine.registers);
+    this._signal('mantissa-signal', this._number.mantissa.digits);
+    this._signal('exponent-signal', this._number.exponent.digits);
+    this._signal('registers-signal', this._engine.registers);
   }
 
   private _processMantissa(opCode: NCOpCode): boolean {
-    if (opCode === NCOpCode.POINT) this._number.point = true;
+    if (opCode === NCOpCode.POINT) this._number.mantissa.point = true;
     else {
       const digit = NCLogic._digits.get(opCode);
       if (digit === undefined) return false;
-      this._number.mantissa = digit;
+      this._number.mantissa.digits = digit;
     }
-    this._engine.x = this._number.number;
+    this._engine.x = this._number.digits;
 
-    this.emit('mantissa-signal', this._number.mantissa);
-    this.emit('registers-signal', this._engine.registers);
+    this._signal('mantissa-signal', this._number.mantissa.digits);
+    this._signal('registers-signal', this._engine.registers);
     return true;
   }
 
   private _processExponent(opCode: NCOpCode): boolean {
-    if (opCode === NCOpCode.SIGN) this._number.negateE();
+    if (opCode === NCOpCode.SIGN) this._number.exponent.sign = !this._number.exponent.sign;
     else {
       const digit = NCLogic._digits.get(opCode);
       if (digit === undefined) return false;
-      this._number.exponent = digit;
+      this._number.exponent.digits = digit;
     }
-    this._engine.x = this._number.number;
+    this._engine.x = this._number.digits;
 
-    this.emit('exponent-signal', this._number.exponent);
-    this.emit('registers-signal', this._engine.registers);
+    this._signal('exponent-signal', this._number.exponent.digits);
+    this._signal('registers-signal', this._engine.registers);
     return true;
   }
 
   private _processControls(opCode: NCOpCode): boolean {
     switch (opCode) {
       case NCOpCode.ENTER_E:
-        if (/^0\.*0*$/.test(this._number.mantissa)) this._number.mantissa = 1;
-        this._number.exponent = 0;
-        this._engine.x = this._number.number;
+        if (/^0\.*0*$/.test(this._number.mantissa.digits)) this._number.mantissa.digits = 1;
+        this._number.exponent.digits = 0;
+        this._engine.x = this._number.digits;
 
         this.synchronize();
         this._state = NCLogicState.EXPONENT;
         return true;
 
       case NCOpCode.CLEAR_X:
-        this._number.mantissa = 0;
-        this._number.exponent = null;
+        this._number.mantissa.digits = 0;
+        this._number.exponent.digits = null;
         this._engine.clearX();
 
         this.synchronize();
