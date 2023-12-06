@@ -8,11 +8,8 @@
 'use strict';
 
 import GObject from 'gi://GObject';
-import {NCOpCode, type NCRegisters} from './extension.common.js';
+import {NCOpCode, type NCRegisters, type NCError} from './extension.common.js';
 import {NCEngine} from './extension.engine.js';
-
-// import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-// Main.notify('Exponent:', NCLogic._EZero.exponent);
 
 const enum NCLogicState {
   MANTISSA,
@@ -71,7 +68,7 @@ class NCExponent {
 
         case 'number':
           if (digit === 0) {
-            this._sign = '';
+            this._sign = '+';
             this._exponent = ''.padStart(NCEngine.Precision.MAX_E, '0');
           }
           break;
@@ -83,7 +80,7 @@ class NCExponent {
   }
 
   public set sign(value: boolean) {
-    this._sign = value ? '' : '-';
+    this._sign = value ? '+' : '-';
   }
 }
 
@@ -128,6 +125,9 @@ export default class NCLogic extends GObject.Object {
           'memory-signal': {
             param_types: [GObject.TYPE_JSOBJECT],
           },
+          'error-signal': {
+            param_types: [GObject.TYPE_JSOBJECT],
+          },
         },
       },
       this
@@ -159,7 +159,7 @@ export default class NCLogic extends GObject.Object {
     this._state = NCLogicState.MANTISSA;
   }
 
-  private _signal(name: string, value: string | NCRegisters): void {
+  private _signal(name: string, value: string | NCRegisters | NCError): void {
     this.emit(name, value);
   }
 
@@ -190,6 +190,7 @@ export default class NCLogic extends GObject.Object {
       if (digit === undefined) return false;
       this._number.exponent.digits = digit;
     }
+
     this._engine.x = this._number.digits;
 
     this._signal('exponent-signal', this._number.exponent.digits);
@@ -221,21 +222,68 @@ export default class NCLogic extends GObject.Object {
     return false;
   }
 
+  private _processOperations(opCode: NCOpCode): boolean {
+    this._engine.x = this._number.digits;
+
+    switch (opCode) {
+      case NCOpCode.PUSH:
+        this._engine.push();
+        break;
+
+      case NCOpCode.PLUS:
+        this._engine.add();
+        break;
+
+      default:
+        return false;
+    }
+
+    this._number.mantissa.digits = 0;
+    this._number.exponent.digits = null;
+
+    const number = this._engine.x.split('e');
+    this._signal('mantissa-signal', number.at(0)!);
+    this._signal('exponent-signal', number.at(1) ?? '');
+    this._signal('registers-signal', this._engine.registers);
+    this._state = NCLogicState.MANTISSA;
+
+    return true;
+  }
+
+  private _processError(error: NCError) {
+    this._number.mantissa.digits = 0;
+    this._number.exponent.digits = null;
+
+    this._signal('mantissa-signal', 'ERROR');
+    this._signal('exponent-signal', '');
+    this._signal('registers-signal', this._engine.registers);
+    this._signal('error-signal', error);
+    this._state = NCLogicState.MANTISSA;
+  }
+
   public keyHandler(_sender: GObject.Object, opCode: NCOpCode): void {
-    switch (this._state) {
-      case NCLogicState.MANTISSA:
-        if (this._processMantissa(opCode)) return;
-        break;
+    try {
+      switch (this._state) {
+        case NCLogicState.MANTISSA:
+          if (this._processMantissa(opCode)) return;
+          break;
 
-      case NCLogicState.EXPONENT:
-        if (this._processExponent(opCode)) return;
-        break;
+        case NCLogicState.EXPONENT:
+          if (this._processExponent(opCode)) return;
+          break;
+      }
+
+      if (this._processControls(opCode)) return;
+
+      if (this._processOperations(opCode)) return;
+    } catch (e) {
+      if (e instanceof RangeError) this._processError({type: 'Range Error', message: e.message});
+      else if (e instanceof Error && /DecimalError/.test(e.message))
+        this._processError({type: 'Decimal Error', message: e.message});
+      else this._processError({type: 'Other Error', message: 'Unknown'});
+      return;
     }
 
-    if (this._processControls(opCode)) {
-      //
-    } else {
-      // error reporting
-    }
+    this._processError({type: 'Operational Error', message: 'Unknown operation'});
   }
 }

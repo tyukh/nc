@@ -53,7 +53,12 @@ export class NCEngine {
   // Stack & memory getters / setters
 
   public set x(value: Decimal | string) {
-    this._register.x = new Decimal(value);
+    const result = new Decimal(value);
+    if (result.isFinite() === false) {
+      this._register.x = new Decimal(0);
+      throw new RangeError(result.toString());
+    }
+    this._register.x = result;
   }
 
   public get x(): string {
@@ -126,25 +131,17 @@ export class NCEngine {
 
   // Binary OPs
 
-  private op2(op: (x: Decimal, y: Decimal) => Decimal): boolean {
-    let result: Decimal;
+  private op2(op: (x: Decimal, y: Decimal) => Decimal): void {
+    const result = op.call(Decimal, this._register.x, this._register.y);
 
-    try {
-      result = op(this._register.x, this._register.y);
-    } catch {
-      return false;
-    }
-
-    if (result.isFinite() === false) return false;
+    if (result.isFinite() === false) throw new RangeError(result.toString());
 
     this.save();
     this.pop();
     this._register.x = result;
-
-    return true;
   }
 
-  public add(): boolean {
-    return this.op2(Decimal.add);
+  public add(): void {
+    this.op2(Decimal.add);
   }
 }

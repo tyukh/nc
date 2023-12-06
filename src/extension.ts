@@ -28,6 +28,7 @@ export default class NCExtension extends Extension {
   private _mantissaSignalId!: number;
   private _exponentSignalId!: number;
   private _registersSignalId!: number;
+  private _errorSignalId!: number;
 
   /**
    * This class is constructed once when your extension is loaded, not
@@ -68,10 +69,6 @@ export default class NCExtension extends Extension {
     if (this._logic === null) this._logic = new NCLogic();
 
     // Connect signals
-    this._keySignalId = this._interface.connect(
-      'key-signal',
-      this._logic.keyHandler.bind(this._logic)
-    );
     this._mantissaSignalId = this._logic.connect(
       'mantissa-signal',
       this._interface.mantissaHandler.bind(this._interface)
@@ -83,6 +80,15 @@ export default class NCExtension extends Extension {
     this._registersSignalId = this._logic.connect(
       'registers-signal',
       this._interface.registersHandler.bind(this._interface)
+    );
+    this._errorSignalId = this._logic.connect(
+      'error-signal',
+      this._interface.errorHandler.bind(this._interface)
+    );
+
+    this._keySignalId = this._interface.connect(
+      'key-signal',
+      this._logic.keyHandler.bind(this._logic)
     );
 
     this._logic.synchronize();
@@ -98,10 +104,12 @@ export default class NCExtension extends Extension {
   public disable(): void {
     if (this._interface !== null) {
       // Disconnect signals
+      this._interface.disconnect(this._keySignalId);
+
       this._logic?.disconnect(this._mantissaSignalId);
       this._logic?.disconnect(this._exponentSignalId);
       this._logic?.disconnect(this._registersSignalId);
-      this._interface.disconnect(this._keySignalId);
+      this._logic?.disconnect(this._errorSignalId);
 
       this._interface.destroy();
     }

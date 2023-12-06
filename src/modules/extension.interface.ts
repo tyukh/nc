@@ -16,7 +16,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
-import {NCOpCode, type NCRegisters} from './extension.common.js';
+import {NCOpCode, type NCRegisters, type NCError} from './extension.common.js';
 
 interface NCInterfaceKeyConstructorProperties extends St.Button.ConstructorProperties {
   key_id?: number | null;
@@ -734,6 +734,10 @@ export default class NCInterface extends GObject.Object {
     this._zRegisterLabel.set_text(value.z);
     this._tRegisterLabel.set_text(value.t);
     this._x0RegisterLabel.set_text(value.x0);
+  }
+
+  public errorHandler(_sender: GObject.Object, value: NCError): void {
+    Main.notify('Numbers Commander:', `${value.type}: "${value.message}"`);
   }
 
   /* private _onIndicatorSet(indicator: number, value: string): void {

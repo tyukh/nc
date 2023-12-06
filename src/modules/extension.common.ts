@@ -31,3 +31,4 @@ export const enum NCOpCode {
 
 export type NCRegisters = {x: string; y: string; z: string; t: string; x0: string};
 export type NCMemory = {m0: string; m1: string; m2: string; m3: string};
+export type NCError = {type: string; message: string};
