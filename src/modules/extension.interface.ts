@@ -226,11 +226,11 @@ export default class NCInterface extends GObject.Object {
       return value;
     }
 
-    this._tRegisterLabel = __addRegister(stack1Box, 'T', font);
-    this._zRegisterLabel = __addRegister(stack1Box, 'Z', font);
-    this._yRegisterLabel = __addRegister(stack1Box, 'Y', font);
-    this._xRegisterLabel = __addRegister(stack1Box, 'X', font);
-    this._x0RegisterLabel = __addRegister(stack2Box, 'X\u{2070}', font);
+    this._x0RegisterLabel = __addRegister(stack1Box, 'X\u{2070}', font);
+    this._tRegisterLabel = __addRegister(stack2Box, 'T', font);
+    this._zRegisterLabel = __addRegister(stack2Box, 'Z', font);
+    this._yRegisterLabel = __addRegister(stack2Box, 'Y', font);
+    this._xRegisterLabel = __addRegister(stack2Box, 'X', font);
 
     stackArea.menu.box.add(stack1Box);
     stackArea.menu.box.add(new PopupMenu.PopupSeparatorMenuItem());

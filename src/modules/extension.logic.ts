@@ -223,15 +223,25 @@ export default class NCLogic extends GObject.Object {
   }
 
   private _processOperations(opCode: NCOpCode): boolean {
-    this._engine.x = this._number.digits;
-
     switch (opCode) {
       case NCOpCode.PUSH:
         this._engine.push();
         break;
 
+      case NCOpCode.SIGN:
+        this._engine.negate();
+        break;
+
       case NCOpCode.PLUS:
         this._engine.add();
+        break;
+
+      case NCOpCode.MINUS:
+        this._engine.sqrt();
+        break;
+
+      case NCOpCode.DIVIDE:
+        this._engine.div();
         break;
 
       default:

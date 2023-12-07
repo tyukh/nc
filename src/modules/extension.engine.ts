@@ -54,7 +54,7 @@ export class NCEngine {
 
   public set x(value: Decimal | string) {
     const result = new Decimal(value);
-    if (result.isFinite() === false) {
+    if (!result.isFinite()) {
       this._register.x = new Decimal(0);
       throw new RangeError(result.toString());
     }
@@ -119,22 +119,35 @@ export class NCEngine {
 
   // Special unary OPs
 
-  public negate() {
-    this._register.x = this._register.x.negated();
-  }
-
   public clearX() {
     this._register.x = new Decimal(0);
   }
 
+  public negate() {
+    this._register.x = this._register.x.negated();
+  }
+
   // Unary OPs
+
+  private op1(op: (x: Decimal) => Decimal): void {
+    const result = op.call(Decimal, this._register.x);
+
+    if (!result.isFinite()) throw new RangeError(result.toString());
+
+    this.save();
+    this._register.x = result;
+  }
+
+  public sqrt(): void {
+    this.op1(Decimal.sqrt);
+  }
 
   // Binary OPs
 
   private op2(op: (x: Decimal, y: Decimal) => Decimal): void {
-    const result = op.call(Decimal, this._register.x, this._register.y);
+    const result = op.call(Decimal, this._register.y, this._register.x);
 
-    if (result.isFinite() === false) throw new RangeError(result.toString());
+    if (!result.isFinite()) throw new RangeError(result.toString());
 
     this.save();
     this.pop();
@@ -143,5 +156,9 @@ export class NCEngine {
 
   public add(): void {
     this.op2(Decimal.add);
+  }
+
+  public div(): void {
+    this.op2(Decimal.div);
   }
 }
