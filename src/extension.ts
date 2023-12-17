@@ -8,27 +8,37 @@
 'use strict';
 
 import Gio from 'gi://Gio';
+import GObject from 'gi://GObject';
+
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 import NCInterface from './modules/extension.interface.js';
 import NCLogic from './modules/extension.logic.js';
 
-import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
-
 export default class NCExtension extends Extension {
   private readonly _settings: Gio.Settings;
 
-  private _font: string;
-  private _position: string;
-  private _order: number;
+  private _interface: NCInterface | null = null;
+  private _logic: NCLogic;
 
-  private _interface: NCInterface | null;
-  private _logic: NCLogic | null;
+  private _signals = new Array<{object: GObject.Object; id: number}>();
 
-  private _keySignalId!: number;
-  private _mantissaSignalId!: number;
-  private _exponentSignalId!: number;
-  private _registersSignalId!: number;
-  private _errorSignalId!: number;
+  private _connect(
+    object: GObject.Object,
+    id: string,
+    callback: (...args: never[]) => unknown,
+    owner: object
+  ): void {
+    this._signals.push({object: object, id: object.connect(id, callback.bind(owner))});
+  }
+
+  private _disconnectAll(): void {
+    while (this._signals.length > 0) {
+      const object = this._signals.pop();
+      object?.object.disconnect(object.id);
+    }
+  }
 
   /**
    * This class is constructed once when your extension is loaded, not
@@ -43,18 +53,9 @@ export default class NCExtension extends Extension {
   constructor(metadata: object) {
     super(metadata);
 
-    this._interface = null;
-    this._logic = null;
-
     this._settings = this.getSettings();
 
-    this._settings.connect('changed::font', this._onExtensionSettingsChanged.bind(this));
-    this._settings.connect('changed::position', this._onExtensionSettingsChanged.bind(this));
-    this._settings.connect('changed::order', this._onExtensionSettingsChanged.bind(this));
-
-    this._font = this._settings.get_string('font')!;
-    this._position = this._settings.get_string('position')!;
-    this._order = this._settings.get_enum('order')!;
+    this._logic = new NCLogic();
   }
 
   /**
@@ -65,33 +66,39 @@ export default class NCExtension extends Extension {
    * widgets, connect signals or modify GNOME Shell's behavior.
    */
   public enable(): void {
-    this._interface = new NCInterface(this, this._font, this._position, this._order);
-    if (this._logic === null) this._logic = new NCLogic();
+    this._interface = new NCInterface(this);
 
     // Connect signals
-    this._mantissaSignalId = this._logic.connect(
-      'mantissa-signal',
-      this._interface.mantissaHandler.bind(this._interface)
-    );
-    this._exponentSignalId = this._logic.connect(
-      'exponent-signal',
-      this._interface.exponentHandler.bind(this._interface)
-    );
-    this._registersSignalId = this._logic.connect(
-      'registers-signal',
-      this._interface.registersHandler.bind(this._interface)
-    );
-    this._errorSignalId = this._logic.connect(
-      'error-signal',
-      this._interface.errorHandler.bind(this._interface)
-    );
+    this._connect(this._settings, 'changed::font', this._onFontSettingsChanged, this);
+    this._connect(this._settings, 'changed::position', this._onPositionSettingsChanged, this);
+    this._connect(this._settings, 'changed::order', this._onPositionSettingsChanged, this);
 
-    this._keySignalId = this._interface.connect(
-      'key-signal',
-      this._logic.keyHandler.bind(this._logic)
+    this._connect(this._logic, 'mantissa-signal', this._interface.mantissaHandler, this._interface);
+    this._connect(this._logic, 'exponent-signal', this._interface.exponentHandler, this._interface);
+    this._connect(
+      this._logic,
+      'registers-signal',
+      this._interface.registersHandler,
+      this._interface
     );
+    this._connect(this._logic, 'error-signal', this._interface.errorHandler, this._interface);
+
+    this._connect(this._interface, 'key-signal', this._logic.keyHandler, this._logic);
 
     this._logic.synchronize();
+    this._interface.font = this._settings.get_string('font');
+
+    /* In here we are adding the button in the status area
+     * - button is and instance of panelMenu.Button
+     * - 0 is the position
+     * - `right` is the box where we want our button to be displayed (left/center/right)
+     */
+    Main.panel.addToStatusArea(
+      this.uuid,
+      this._interface,
+      this._settings.get_enum('order'),
+      this._settings.get_string('position')
+    );
   }
 
   /**
@@ -102,26 +109,19 @@ export default class NCExtension extends Extension {
    * Not doing so is the most common reason extensions are rejected in review!
    */
   public disable(): void {
-    if (this._interface !== null) {
-      // Disconnect signals
-      this._interface.disconnect(this._keySignalId);
-
-      this._logic?.disconnect(this._mantissaSignalId);
-      this._logic?.disconnect(this._exponentSignalId);
-      this._logic?.disconnect(this._registersSignalId);
-      this._logic?.disconnect(this._errorSignalId);
-
-      this._interface.destroy();
-    }
+    // Disconnect signals
+    this._disconnectAll();
+    this._interface?.destroy();
     this._interface = null;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private _onExtensionSettingsChanged(_source: this, _key: string): void {
-    this._font = this._settings.get_string('font')!;
-    this._position = this._settings.get_string('position')!;
-    this._order = this._settings.get_enum('order')!;
+  private _onFontSettingsChanged(_source: this, _key: string): void {
+    this._interface!.font = this._settings.get_string('font');
+  }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private _onPositionSettingsChanged(_source: this, _key: string): void {
     this.disable();
     this.enable();
   }

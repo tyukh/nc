@@ -24,6 +24,7 @@
         "pgettext",
         "prefs",
         "printerr",
+        "stylesheet",
         "tsbuildinfo",
         "Tyukh"
     ],

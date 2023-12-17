@@ -1,65 +1,78 @@
+/* extension.interface.css
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ * SPDX-FileCopyrightText: 2023 Roman Tyukh
+ *
+ */
+
 .NC-PopupBaseMenuItem {
     padding: 0em;
     margin: 0em;
 }
 
-.NC-BoxLayout {
+StBoxLayout.NC-BoxLayout {
     padding: 0em;
     margin: 0em;
 }
 
-.NC-stack1BoxLayout {
+StBoxLayout.NC-stack1BoxLayout {
     padding-top: 0.5em;
     padding-bottom: 0em;
 }
 
-.NC-stack2BoxLayout {
+StBoxLayout.NC-stack2BoxLayout {
     padding-top: 0em;
     /* 0.5em */
     padding-bottom: 0em;
 }
 
-.NC-registerBoxLayout {
+/*** NCValue */
+
+.controls-value {
     padding-top: 0.25em; 
     padding-bottom: 0.25em;
     padding-left: 0.5em;
     padding-right: 0.5em;
 }
 
-.NC-registerValueBoxLayout {
+.controls-value-value {
     color: white;
     background-color: gray;
     height: 1.5em;
     border-radius: 0.4em;
     border-width: 0.1em;
     border-color: gainsboro;
-}
-
-.NC-registerNameBoxLayout {
-    color: white;
-    width: 1.25em;
-    margin-left: 0.5em;
-}
-
-.NC-registerValueLabel {
-    color: white;
-    margin-left: 0.5em;
     font-size: 1em;
     font-weight: normal;
+    padding-left: 0.25em;
+    padding-right: 0.25em;
+    padding-top: 0.2em;
+    padding-bottom: 0em;
 }
 
-.NC-registerNameLabel {
+.controls-value-label {
     color: white;
+    width: 1.5em;
     font-size: 1em;
     font-weight: bold;
+    padding-left: 0em;
+    padding-right: 0em;
+    padding-top: 0.2em;
+    padding-bottom: 0em;
 }
 
-.NC-indicatorBoxLayout {
+.controls-value-divider {
+    width: 0.5em;
+}
+
+/* NCValue ***/
+
+StBoxLayout.NC-indicatorBoxLayout {
     padding-top: 0.75em;
     padding-bottom: 0.5em;
 }
 
-.NC-indicatorMantissaBoxLayout {
+StBoxLayout.NC-indicatorMantissaBoxLayout {
     color: white;
     background-color: grey;
     height: 2.5em;
@@ -68,12 +81,12 @@
     border-color: gainsboro;
 }
 
-.NC-indicatorExponentBoxLayout {
+StBoxLayout.NC-indicatorExponentBoxLayout {
     color: white;
     background-color: grey;
     height: 2.5em;
-    width: 4.7em;
-    margin-left: 0.3em; 
+    width: 4.75em;
+    margin-left: 0.2em; 
     border-radius: 0.4em;
     border-width: 0.1em;
     border-color: gainsboro;
@@ -95,102 +108,79 @@
     font-weight: normal;
 }
 
-.NC-labelFLabel {
+/*** NCPlaceholder */
+
+.controls-placeholder {
+    padding: 0em;
+    margin: 0em;
+}
+
+.controls-placeholder-box {
+    padding: 0em;
+    margin: 0em;
+}
+
+.controls-placeholder-label-left {
+    padding: 0em;
+    margin: 0em;
     color: yellow;
     font-size: 0.8em;
     font-weight: normal;
 }
 
-.NC-labelKLabel {
+.controls-placeholder-label-right {
+    padding: 0em;
+    margin: 0em;
     color: lightskyblue;
     font-size: 0.8em;
     font-weight: normal;
 }
 
-.NC-grayButton {
+/* NCPlaceholder ***/
+
+/*** NCKey */
+
+NCKey {
+    height: 1.75em;
+    width: 3em;
+    margin: 0.15em;
+    border-radius: 0.3em;
+    border-width: 0.08em;
+    border-color: black;
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
+NCKey:hover {
+    border-color: white;
+}
+
+NCKey.NC-grayButton {
     color: black;
     background-color: gainsboro;
-    height: 2.0em;
-    width: 2.6em;
-    margin: 0.15em;
-    border-radius: 0.3em;
-    border-width: 0.08em;
-    border-color: black;
-    font-size: 1.25em;
-    font-weight: bold;
 }
 
-.NC-grayButton:hover {
-    border-color: white;
-}
-
-.NC-redButton {
+NCKey.NC-redButton {
     color: white;
     background-color: crimson;
-    height: 2.0em;
-    width: 2.6em;
-    margin: 0.15em;
-    border-radius: 0.3em;
-    border-width: 0.08em;
-    border-color: black;
-    font-size: 1.25em;
-    font-weight: bold;
 }
 
-.NC-redButton:hover {
-    border-color: white;
-}
-
-.NC-yellowButton {
+NCKey.NC-yellowButton {
     color: black;
     background-color: yellow;
-    height: 2.0em;
-    width: 2.6em;
-    margin: 0.15em;
-    border-radius: 0.3em;
-    border-width: 0.08em;
-    border-color: black;
-    font-size: 1.25em;
-    font-weight: bold;
 }
 
-.NC-yellowButton:hover {
-    border-color: white;
-}
-
-.NC-blueButton {
+NCKey.NC-blueButton {
     color: white;
     background-color: steelblue;
-    height: 2.0em;
-    width: 2.6em;
-    margin: 0.15em;
-    border-radius: 0.3em;
-    border-width: 0.08em;
-    border-color: black;
-    font-size: 1.25em;
-    font-weight: bold;
 }
 
-.NC-blueButton:hover {
-    border-color: white;
-}
-
-.NC-darkgrayButton {
+NCKey.NC-darkgrayButton {
     color: white;
     background-color: dimgray;
-    height: 2.0em;
-    width: 2.6em;
-    margin: 0.15em;
-    border-radius: 0.3em;
-    border-width: 0.08em;
-    border-color: black;
-    font-size: 1.25em;
-    font-weight: bold;
 }
 
-.NC-darkgrayButton:hover {
-    border-color: white;
-}
+/* NCKey ***/
 
 .NC-controlBoxLayout {
     padding: 0em;

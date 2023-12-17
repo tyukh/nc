@@ -5,19 +5,17 @@
   "files.autoSave": "afterDelay",
   "git.autofetch": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "search.exclude": {
     "**/.yarn": true,
     "**/.pnp.*": true
   },
   "eslint.enable": true,
-  "eslint.alwaysShowStatus": true,
   "eslint.format.enable": true,
   "eslint.lintTask.enable": true,
   "eslint.useESLintClass": true,
   "eslint.nodePath": ".yarn/sdks",
-  "eslint.packageManager": "yarn",
   "[javascript]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },

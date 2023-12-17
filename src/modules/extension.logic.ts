@@ -25,7 +25,7 @@ class NCMantissa {
     return this._integer + this._point + this._fraction;
   }
 
-  public set digits(digit: string | number) {
+  public set digits(digit: string | 0 | 1) {
     switch (typeof digit) {
       case 'string':
         if (this._integer.length + this._fraction.length < NCEngine.Precision.MAX) {
@@ -56,7 +56,7 @@ class NCExponent {
     return this._sign + this._exponent;
   }
 
-  public set digits(digit: string | number | null) {
+  public set digits(digit: string | 0 | null) {
     if (digit === null) {
       this._sign = '';
       this._exponent = '';

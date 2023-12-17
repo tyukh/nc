@@ -6,7 +6,7 @@
  */
 
 declare module 'resource:///org/gnome/shell/ui/panelMenu.js' {
-  import {PopupMenu} from 'resource:///org/gnome/shell/ui/popupMenu.js';
+  import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
   import Clutter from 'gi://Clutter';
   import St from 'gi://St';
 
