@@ -18,7 +18,9 @@ import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
 import {type NCRegisters, type NCError} from './extension.common.js';
 import {NCKey, NCValue} from './extension.controls.js';
-import * as NCTemplate from './extension.template.js';
+
+import Template from './extension.template.js';
+import type * as Types from './extension.templates.js';
 
 export default class NCInterface extends PanelMenu.Button {
   static {
@@ -64,58 +66,84 @@ export default class NCInterface extends PanelMenu.Button {
 
   private _construct(): void {
     const iterate = (
-      owner: NCTemplate.NCTemplateTypes | PopupMenu.PopupMenu,
-      template: NCTemplate.NCTemplate,
+      owner: Types.NCTemplateTypes | PopupMenu.PopupMenu | PopupMenu.PopupSubMenu,
+      template: Types.NCTemplate,
       guard: number
     ): void => {
       if (guard > 100) throw new Error(_('Recursion is too deep in NCInterface._construct()'));
 
-      const create = (item: NCTemplate.NCTemplateObjects): void => {
-        const type = (item as NCTemplate.NCTemplateObject).type;
-        if (type !== undefined) {
-          let element: NCTemplate.NCTemplateTypes;
+      const insert = (control: Types.NCTemplateTypes): void => {
+        if (owner instanceof PopupMenu.PopupMenu) {
+          owner.addMenuItem.call(owner, control as PopupMenu.PopupBaseMenuItem);
+          return;
+        }
+        if (owner instanceof PopupMenu.PopupSubMenu) {
+          if (control instanceof PopupMenu.PopupBaseMenuItem)
+            owner.addMenuItem.call(owner, control as PopupMenu.PopupBaseMenuItem);
+          else owner.box.add.call(owner.box, control);
+          return;
+        }
 
-          switch (type) {
+        owner.add.call(owner, control);
+      };
+
+      const create = (item: Types.NCTemplateObject): void => {
+        if (item.type !== undefined) {
+          let master: Types.NCTemplateTypes | PopupMenu.PopupSubMenu;
+
+          switch (item.type) {
             case PopupMenu.PopupSubMenuMenuItem:
               {
-                const properties = {...(item as NCTemplate.NCTemplatePopupSubMenuMenuItem)};
-                const control = new PopupMenu.PopupSubMenuMenuItem(properties.label ?? '', false);
-                properties.ornament && control.setOrnament(properties.ornament);
-                (owner as PopupMenu.PopupMenu).addMenuItem(control);
-                element = control;
+                const control = new PopupMenu.PopupSubMenuMenuItem(item.label ?? '', false);
+                item.ornament && control.setOrnament(item.ornament);
+                insert(control);
+                master = control.menu;
               }
               break;
 
             case PopupMenu.PopupSeparatorMenuItem:
               {
                 const control = new PopupMenu.PopupSeparatorMenuItem();
-                (owner as PopupMenu.PopupMenu).addMenuItem(control);
-                element = control;
+                insert(control);
               }
-              break;
+              return; // Not 'include' allowed
 
             case PopupMenu.PopupBaseMenuItem:
               {
-                const properties = {...(item as NCTemplate.NCTemplatePopupBaseMenuItem)};
-                const control = new PopupMenu.PopupBaseMenuItem(properties.params);
-                properties.ornament && control.setOrnament(properties.ornament);
-                (owner as PopupMenu.PopupMenu).addMenuItem(control);
-                element = control;
+                const control = new PopupMenu.PopupBaseMenuItem(item.params);
+                item.ornament && control.setOrnament(item.ornament);
+                insert(control);
+                master = control;
+              }
+              break;
+
+            case St.BoxLayout:
+              {
+                const control = new St.BoxLayout(item.params);
+                insert(control);
+                master = control;
+              }
+              break;
+
+            case NCValue:
+              {
+                const control = new NCValue(item.params);
+                insert(control);
+                master = control;
               }
               break;
           }
 
-          if ((item as NCTemplate.NCTemplateObject).include !== undefined)
-            iterate(element!, (item as NCTemplate.NCTemplateObject).include!, guard + 1);
+          if (item.include !== undefined) iterate(master!, item.include!, guard + 1);
         }
       };
 
       if (Array.isArray(template))
-        (template as NCTemplate.NCTemplateObject[]).forEach((item) => create(item));
-      else create(template);
+        template.forEach((item) => create(item as Types.NCTemplateObject));
+      else create(template as Types.NCTemplateObject);
     };
 
-    iterate(this.menu, NCTemplate.Template(), 0);
+    iterate(this.menu, Template(), 0);
   }
 
   public set font(font: string) {
