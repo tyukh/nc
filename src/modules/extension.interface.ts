@@ -16,11 +16,15 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
-import {type NCRegisters, type NCError} from './extension.common.js';
+import {type NCRegisters, type NCError, NCOpCodes} from './extension.common.js';
 import {NCKey, NCValue} from './extension.controls.js';
-
-import Template from './extension.template.js';
-import type * as Types from './extension.templates.js';
+import {NCTemplateInstance, NCKeys} from './extension.template.js';
+import {
+  type NCTemplate,
+  type NCTemplateObjects,
+  type NCTemplateTypeOfs,
+  NCTemplateHelper,
+} from './extension.templates.js';
 
 export default class NCInterface extends PanelMenu.Button {
   static {
@@ -39,13 +43,43 @@ export default class NCInterface extends PanelMenu.Button {
 
   private _extension: Extension;
 
-  private _x0RegisterLabel!: NCValue;
-  private _tRegisterLabel!: NCValue;
-  private _zRegisterLabel!: NCValue;
-  private _yRegisterLabel!: NCValue;
-  private _xRegisterLabel!: NCValue;
-  private _mantissaIndicatorLabel!: St.Label;
-  private _exponentIndicatorLabel!: St.Label;
+  private _mapKeyOpCodes: Map<NCKeys, NCOpCodes> = new Map<NCKeys, NCOpCodes>([
+    [NCKeys.ZERO, NCOpCodes.ZERO],
+    [NCKeys.ONE, NCOpCodes.ONE],
+    [NCKeys.TWO, NCOpCodes.TWO],
+    [NCKeys.THREE, NCOpCodes.THREE],
+    [NCKeys.FOUR, NCOpCodes.FOUR],
+    [NCKeys.FIVE, NCOpCodes.FIVE],
+    [NCKeys.SIX, NCOpCodes.SIX],
+    [NCKeys.SEVEN, NCOpCodes.SEVEN],
+    [NCKeys.EIGHT, NCOpCodes.EIGHT],
+    [NCKeys.NINE, NCOpCodes.NINE],
+    [NCKeys.POINT, NCOpCodes.POINT],
+    [NCKeys.SIGN, NCOpCodes.SIGN],
+    [NCKeys.ENTER_E, NCOpCodes.ENTER_E],
+    [NCKeys.PUSH, NCOpCodes.PUSH],
+    [NCKeys.SWAP, NCOpCodes.SWAP],
+    [NCKeys.CLEAR_X, NCOpCodes.CLEAR_X],
+    [NCKeys.BACK_X, NCOpCodes.BACK_X],
+    [NCKeys.PLUS, NCOpCodes.PLUS],
+    [NCKeys.MINUS, NCOpCodes.MINUS],
+    [NCKeys.MULTIPLY, NCOpCodes.MULTIPLY],
+    [NCKeys.DIVIDE, NCOpCodes.DIVIDE],
+    [NCKeys.F, NCOpCodes.RESERVED_NULL],
+    [NCKeys.K, NCOpCodes.RESERVED_NULL],
+    [NCKeys.MX, NCOpCodes.RESERVED_NULL],
+    [NCKeys.XM, NCOpCodes.RESERVED_NULL],
+    [NCKeys.RESERVED_NULL, NCOpCodes.RESERVED_NULL],
+  ]);
+
+  private _registerX0: NCValue | null = null;
+  private _registerX: NCValue | null = null;
+  private _registerY: NCValue | null = null;
+  private _registerZ: NCValue | null = null;
+  private _registerT: NCValue | null = null;
+
+  private _mantissaIndicatorLabel: St.Label | null = null;
+  private _exponentIndicatorLabel: St.Label | null = null;
 
   constructor(extension: Extension) {
     super(0.0, _(`${extension.uuid} Indicator`));
@@ -66,84 +100,50 @@ export default class NCInterface extends PanelMenu.Button {
 
   private _construct(): void {
     const iterate = (
-      owner: Types.NCTemplateTypes | PopupMenu.PopupMenu | PopupMenu.PopupSubMenu,
-      template: Types.NCTemplate,
+      parent: InstanceType<NCTemplateTypeOfs> | PopupMenu.PopupMenu,
+      template: NCTemplate,
       guard: number
     ): void => {
       if (guard > 100) throw new Error(_('Recursion is too deep in NCInterface._construct()'));
 
-      const insert = (control: Types.NCTemplateTypes): void => {
-        if (owner instanceof PopupMenu.PopupMenu) {
-          owner.addMenuItem.call(owner, control as PopupMenu.PopupBaseMenuItem);
-          return;
-        }
-        if (owner instanceof PopupMenu.PopupSubMenu) {
-          if (control instanceof PopupMenu.PopupBaseMenuItem)
-            owner.addMenuItem.call(owner, control as PopupMenu.PopupBaseMenuItem);
-          else owner.box.add.call(owner.box, control);
-          return;
+      const create = (element: NCTemplateObjects): void => {
+        const helper = new NCTemplateHelper(element);
+
+        if (parent instanceof PopupMenu.PopupMenu)
+          parent.addMenuItem.call(parent, helper.control as PopupMenu.PopupBaseMenuItem);
+        else if (parent instanceof PopupMenu.PopupSubMenuMenuItem)
+          if (helper.control instanceof PopupMenu.PopupBaseMenuItem)
+            parent.menu.addMenuItem.call(
+              parent.menu,
+              helper.control as PopupMenu.PopupBaseMenuItem
+            );
+          else parent.menu.box.add.call(parent.menu.box, helper.control);
+        else parent.add_actor.call(parent, helper.control);
+
+        if (helper.property) {
+          const property = this[helper.property as keyof NCInterface];
+          if (typeof property === typeof helper.control)
+            (this[helper.property as keyof NCInterface] as typeof property) = helper.control;
         }
 
-        owner.add.call(owner, control);
+        if (helper.signal)
+          helper.signal.forEach((signal) => {
+            typeof this[signal.callback as keyof NCInterface] === 'function' &&
+              helper.control.connect(
+                signal.signal,
+                // eslint-disable-next-line @typescript-eslint/ban-types
+                (this[signal.callback as keyof NCInterface] as Function).bind(this)
+              );
+          });
+
+        if (helper.include) iterate(helper.control, helper.include, guard + 1);
       };
 
-      const create = (item: Types.NCTemplateObject): void => {
-        if (item.type !== undefined) {
-          let master: Types.NCTemplateTypes | PopupMenu.PopupSubMenu;
-
-          switch (item.type) {
-            case PopupMenu.PopupSubMenuMenuItem:
-              {
-                const control = new PopupMenu.PopupSubMenuMenuItem(item.label ?? '', false);
-                item.ornament && control.setOrnament(item.ornament);
-                insert(control);
-                master = control.menu;
-              }
-              break;
-
-            case PopupMenu.PopupSeparatorMenuItem:
-              {
-                const control = new PopupMenu.PopupSeparatorMenuItem();
-                insert(control);
-              }
-              return; // Not 'include' allowed
-
-            case PopupMenu.PopupBaseMenuItem:
-              {
-                const control = new PopupMenu.PopupBaseMenuItem(item.params);
-                item.ornament && control.setOrnament(item.ornament);
-                insert(control);
-                master = control;
-              }
-              break;
-
-            case St.BoxLayout:
-              {
-                const control = new St.BoxLayout(item.params);
-                insert(control);
-                master = control;
-              }
-              break;
-
-            case NCValue:
-              {
-                const control = new NCValue(item.params);
-                insert(control);
-                master = control;
-              }
-              break;
-          }
-
-          if (item.include !== undefined) iterate(master!, item.include!, guard + 1);
-        }
-      };
-
-      if (Array.isArray(template))
-        template.forEach((item) => create(item as Types.NCTemplateObject));
-      else create(template as Types.NCTemplateObject);
+      if (Array.isArray(template)) template.forEach((element) => create(element));
+      else create(template);
     };
 
-    iterate(this.menu, Template(), 0);
+    iterate(this.menu, NCTemplateInstance(), 0);
   }
 
   public set font(font: string) {
@@ -161,84 +161,30 @@ export default class NCInterface extends PanelMenu.Button {
   }
 
   public mantissaHandler(_sender: GObject.Object, value: string): void {
-    this._mantissaIndicatorLabel.set_text(value);
+    this._mantissaIndicatorLabel && this._mantissaIndicatorLabel.set_text(value);
   }
 
   public exponentHandler(_sender: GObject.Object, value: string): void {
-    this._exponentIndicatorLabel.set_text(value);
+    this._exponentIndicatorLabel && this._exponentIndicatorLabel.set_text(value);
   }
 
   public registersHandler(_sender: GObject.Object, value: NCRegisters): void {
-    this._xRegisterLabel.value = value.x;
-    this._yRegisterLabel.value = value.y;
-    this._zRegisterLabel.value = value.z;
-    this._tRegisterLabel.value = value.t;
-    this._x0RegisterLabel.value = value.x0;
+    this._registerX && (this._registerX.value = value.x);
+    this._registerY && (this._registerY.value = value.y);
+    this._registerZ && (this._registerZ.value = value.z);
+    this._registerT && (this._registerT.value = value.t);
+    this._registerX0 && (this._registerX0.value = value.x0);
   }
 
   public errorHandler(_sender: GObject.Object, value: NCError): void {
     Main.notify('Numbers Commander:', `${value.type}: "${value.message}"`);
   }
 
-  /* private _onIndicatorSet(indicator: number, value: string): void {
-      switch (indicator) {
-        case Processor.Processor.Indicator.MANTISSA:
-          this._mantissaIndicatorLabel.set_text(value);
-          break;
-
-        case Processor.Processor.Indicator.EXPONENT:
-          this._exponentIndicatorLabel.set_text(value);
-          break;
-
-        case Processor.Processor.Indicator.REGISTER_X:
-          this._xRegisterLabel.set_text(this._formatDecimal(value));
-          break;
-
-        case Processor.Processor.Indicator.REGISTER_Y:
-          this._yRegisterLabel.set_text(this._formatDecimal(value));
-          break;
-
-        case Processor.Processor.Indicator.REGISTER_Z:
-          this._zRegisterLabel.set_text(this._formatDecimal(value));
-          break;
-
-        case Processor.Processor.Indicator.REGISTER_T:
-          this._tRegisterLabel.set_text(this._formatDecimal(value));
-          break;
-
-        case Processor.Processor.Indicator.REGISTER_X1:
-          this._x1RegisterLabel.set_text(this._formatDecimal(value));
-          break;
-
-        case Processor.Processor.Indicator.MODE:
-          switch (value) {
-            case Processor.Processor.Mode.NORMAL_MODE:
-              break;
-
-            case Processor.Processor.Mode.EE_MODE:
-              break;
-
-            case Processor.Processor.Mode.F_MODE:
-              break;
-
-            case Processor.Processor.Mode.K_MODE:
-              break;
-
-            case Processor.Processor.Mode.E_MODE:
-              break;
-
-            default:
-              break;
-          }
-          break;
-
-        default:
-      }
-    } */
-
-  private _onKeyboardDispatcher(button: NCKey): void {
-    // this._processor.keyPressed(button.keyId);
-    this.emit('key-signal', button.keyId);
+  private _onKeyboardDispatcher(key: NCKey): void {
+    this.emit(
+      'key-signal',
+      this._mapKeyOpCodes.get(key.keyId ?? NCKeys.RESERVED_NULL) ?? NCOpCodes.RESERVED_NULL
+    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -394,7 +340,7 @@ export default class NCInterface extends PanelMenu.Button {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private _onHelpButtonClicked(): void {}
+  private _onInfoButtonClicked(): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onCopyButtonClicked(): void {}

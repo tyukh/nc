@@ -178,6 +178,11 @@ NCKey.NC-blueButton {
 }
 
 NCKey.NC-darkgrayButton {
+    color: black;
+    background-color: darkgray;
+}
+
+NCKey.NC-dimgrayButton {
     color: white;
     background-color: dimgray;
 }

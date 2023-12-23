@@ -8,7 +8,7 @@
 'use strict';
 
 import GObject from 'gi://GObject';
-import {NCOpCode, type NCRegisters, type NCError} from './extension.common.js';
+import {NCOpCodes, type NCRegisters, type NCError} from './extension.common.js';
 import {NCEngine} from './extension.engine.js';
 
 const enum NCLogicState {
@@ -134,17 +134,17 @@ export default class NCLogic extends GObject.Object {
     );
   }
 
-  private static readonly _digits: Readonly<Map<NCOpCode, string>> = new Map([
-    [NCOpCode.ZERO, '0'],
-    [NCOpCode.ONE, '1'],
-    [NCOpCode.TWO, '2'],
-    [NCOpCode.THREE, '3'],
-    [NCOpCode.FOUR, '4'],
-    [NCOpCode.FIVE, '5'],
-    [NCOpCode.SIX, '6'],
-    [NCOpCode.SEVEN, '7'],
-    [NCOpCode.EIGHT, '8'],
-    [NCOpCode.NINE, '9'],
+  private readonly _digits: Readonly<Map<NCOpCodes, string>> = new Map([
+    [NCOpCodes.ZERO, '0'],
+    [NCOpCodes.ONE, '1'],
+    [NCOpCodes.TWO, '2'],
+    [NCOpCodes.THREE, '3'],
+    [NCOpCodes.FOUR, '4'],
+    [NCOpCodes.FIVE, '5'],
+    [NCOpCodes.SIX, '6'],
+    [NCOpCodes.SEVEN, '7'],
+    [NCOpCodes.EIGHT, '8'],
+    [NCOpCodes.NINE, '9'],
   ]);
 
   private _engine: NCEngine;
@@ -169,10 +169,10 @@ export default class NCLogic extends GObject.Object {
     this._signal('registers-signal', this._engine.registers);
   }
 
-  private _processMantissa(opCode: NCOpCode): boolean {
-    if (opCode === NCOpCode.POINT) this._number.mantissa.point = true;
+  private _processMantissa(opCode: NCOpCodes): boolean {
+    if (opCode === NCOpCodes.POINT) this._number.mantissa.point = true;
     else {
-      const digit = NCLogic._digits.get(opCode);
+      const digit = this._digits.get(opCode);
       if (digit === undefined) return false;
       this._number.mantissa.digits = digit;
     }
@@ -183,10 +183,10 @@ export default class NCLogic extends GObject.Object {
     return true;
   }
 
-  private _processExponent(opCode: NCOpCode): boolean {
-    if (opCode === NCOpCode.SIGN) this._number.exponent.sign = !this._number.exponent.sign;
+  private _processExponent(opCode: NCOpCodes): boolean {
+    if (opCode === NCOpCodes.SIGN) this._number.exponent.sign = !this._number.exponent.sign;
     else {
-      const digit = NCLogic._digits.get(opCode);
+      const digit = this._digits.get(opCode);
       if (digit === undefined) return false;
       this._number.exponent.digits = digit;
     }
@@ -198,9 +198,9 @@ export default class NCLogic extends GObject.Object {
     return true;
   }
 
-  private _processControls(opCode: NCOpCode): boolean {
+  private _processControls(opCode: NCOpCodes): boolean {
     switch (opCode) {
-      case NCOpCode.ENTER_E:
+      case NCOpCodes.ENTER_E:
         if (/^0\.*0*$/.test(this._number.mantissa.digits)) this._number.mantissa.digits = 1;
         this._number.exponent.digits = 0;
         this._engine.x = this._number.digits;
@@ -209,7 +209,7 @@ export default class NCLogic extends GObject.Object {
         this._state = NCLogicState.EXPONENT;
         return true;
 
-      case NCOpCode.CLEAR_X:
+      case NCOpCodes.CLEAR_X:
         this._number.mantissa.digits = 0;
         this._number.exponent.digits = null;
         this._engine.clearX();
@@ -222,25 +222,25 @@ export default class NCLogic extends GObject.Object {
     return false;
   }
 
-  private _processOperations(opCode: NCOpCode): boolean {
+  private _processOperations(opCode: NCOpCodes): boolean {
     switch (opCode) {
-      case NCOpCode.PUSH:
+      case NCOpCodes.PUSH:
         this._engine.push();
         break;
 
-      case NCOpCode.SIGN:
+      case NCOpCodes.SIGN:
         this._engine.negate();
         break;
 
-      case NCOpCode.PLUS:
+      case NCOpCodes.PLUS:
         this._engine.add();
         break;
 
-      case NCOpCode.MINUS:
+      case NCOpCodes.MINUS:
         this._engine.sqrt();
         break;
 
-      case NCOpCode.DIVIDE:
+      case NCOpCodes.DIVIDE:
         this._engine.div();
         break;
 
@@ -271,7 +271,7 @@ export default class NCLogic extends GObject.Object {
     this._state = NCLogicState.MANTISSA;
   }
 
-  public keyHandler(_sender: GObject.Object, opCode: NCOpCode): void {
+  public keyHandler(_sender: GObject.Object, opCode: NCOpCodes): void {
     try {
       switch (this._state) {
         case NCLogicState.MANTISSA:
